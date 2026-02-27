@@ -65,8 +65,8 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
   );
 
   const mainSectionTitle = (title: string) => (
-    <div style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <div style={{ width: '4px', height: '18px', background: accent, borderRadius: '2px', flexShrink: 0 }} />
+    <div style={{ marginBottom: '16px', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ width: '4px', height: '22px', background: accent, borderRadius: '2px', flexShrink: 0 }} />
       <h2 style={{
         fontSize: '13px',
         fontWeight: 700,
@@ -74,6 +74,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         textTransform: 'uppercase',
         color: '#111827',
         margin: 0,
+        paddingTop: '1px',
       }}>
         {title}
       </h2>
