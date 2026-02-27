@@ -1,6 +1,6 @@
+/// <reference types="vite/client" />
 import { CVData, CVSettings } from '../types/cv.types';
 import { ATSScoreResult, ATSIssue } from '../types/ai.types';
-import Anthropic from '@anthropic-ai/sdk';
 
 export const calculateATSScore = (cvData: CVData, settings: CVSettings, jobKeywords?: string[]): ATSScoreResult => {
   const issues: ATSIssue[] = [];
@@ -133,15 +133,8 @@ export const evaluateATSWithClaude = async (
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
   if (!apiKey) {
-    throw new Error('Anthropic API key not configured. Please add VITE_ANTHROPIC_API_KEY to .env');
+    throw new Error('API key Anthropic non configurata. Aggiungi VITE_ANTHROPIC_API_KEY nel file .env');
   }
-
-  const client = new Anthropic({
-    apiKey,
-    defaultHeaders: {
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-  });
 
   // Format CV data for Claude
   const cvText = formatCVForAnalysis(cvData);
@@ -182,29 +175,46 @@ Valuta:
 
 Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
 
-  const message = await client.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
-    max_tokens: 1024,
-    messages: [
-      {
-        role: 'user',
-        content: prompt,
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
       },
-    ],
-  });
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
 
-  // Extract JSON from response
-  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
+      throw new Error(err.error?.message || `API error: ${response.status}`);
+    }
 
-  // Parse JSON from response (handle markdown code blocks)
-  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    throw new Error('Failed to parse Claude response');
+    const data = await response.json();
+    const responseText = data.content[0].text;
+
+    // Parse JSON from response (handle markdown code blocks)
+    const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Failed to parse Claude response');
+    }
+
+    const jsonStr = jsonMatch[1] || jsonMatch[0];
+    const result = JSON.parse(jsonStr) as ATSScoreResult;
+
+    return result;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error('Unknown error during ATS evaluation');
   }
-
-  const result = JSON.parse(jsonMatch[0]) as ATSScoreResult;
-
-  return result;
 };
 
 /**
