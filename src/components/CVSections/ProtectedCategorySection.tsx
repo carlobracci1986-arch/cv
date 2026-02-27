@@ -11,6 +11,9 @@ function getCategoryLabel(type?: string, other?: string): string {
   if (type === 'altra') {
     return other || 'Altra categoria protetta';
   }
+  if (!type) {
+    return 'Categoria protetta';
+  }
   return (PROTECTED_CATEGORY_LABELS as any)[type] || 'Categoria protetta';
 }
 
