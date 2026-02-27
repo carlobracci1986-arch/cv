@@ -6,10 +6,10 @@ import { CVData } from '../types/cv.types';
 import { OptimizationResult, CoverLetterOptions, InterviewPrepResult } from '../types/ai.types';
 
 const getProvider = () => {
-  const provider = import.meta.env.VITE_AI_PROVIDER || 'openrouter';
+  const provider = import.meta.env.VITE_AI_PROVIDER || 'claude';
   if (provider !== 'claude' && provider !== 'gemini' && provider !== 'openrouter') {
-    console.warn(`Provider non riconosciuto: ${provider}. Usando 'openrouter' come fallback.`);
-    return 'openrouter';
+    console.warn(`Provider non riconosciuto: ${provider}. Usando 'claude' come fallback.`);
+    return 'claude';
   }
   console.log(`Usando provider AI: ${provider}`);
   return provider as 'claude' | 'gemini' | 'openrouter';
