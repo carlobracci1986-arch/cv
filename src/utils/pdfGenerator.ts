@@ -23,7 +23,7 @@ export const generatePDFFromElement = async (
     watermark,
   } = options;
 
-  const scale = quality === 'high' ? 3 : 2;
+  const scale = quality === 'high' ? 4 : 2.5;
 
   const canvas = await html2canvas(element, {
     scale,

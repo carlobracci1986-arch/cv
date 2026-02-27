@@ -51,7 +51,8 @@
 .cv-section.gdpr-consent {
   margin-top: 2rem;
   padding-top: 1rem;
-  page-break-inside: avoid;
+  padding-bottom: 1rem;
+  page-break-inside: auto;
   border-top: 1px solid #e5e7eb;
 }
 
