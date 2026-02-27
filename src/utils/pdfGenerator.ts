@@ -23,7 +23,7 @@ export const generatePDFFromElement = async (
     watermark,
   } = options;
 
-  const scale = quality === 'high' ? 2 : 1.5;
+  const scale = quality === 'high' ? 3 : 2;
 
   const canvas = await html2canvas(element, {
     scale,
@@ -33,9 +33,10 @@ export const generatePDFFromElement = async (
     logging: false,
     windowWidth: element.scrollWidth,
     windowHeight: element.scrollHeight,
+    imageTimeout: 0,
   });
 
-  const imgData = canvas.toDataURL('image/jpeg', quality === 'high' ? 0.95 : 0.85);
+  const imgData = canvas.toDataURL('image/png');
   const pdf = new jsPDF({
     orientation: 'portrait',
     unit: 'mm',
