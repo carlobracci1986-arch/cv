@@ -24,6 +24,7 @@ import { CVCustomizer } from '../components/CVCustomizer';
 import { VersionList } from '../components/VersionManager/VersionList';
 import { PrivacySettings } from '../components/Privacy/PrivacySettings';
 import { AIConsentDialog } from '../components/Privacy/AIConsentDialog';
+import { AdvancedSettings } from '../components/Settings/AdvancedSettings';
 
 import { JobDescriptionInput } from '../components/AIFeatures/CVOptimizer/JobDescriptionInput';
 import { OptimizationModal } from '../components/AIFeatures/CVOptimizer/OptimizationModal';
@@ -550,6 +551,14 @@ export const Editor: React.FC = () => {
               <div className="p-4 border-t border-gray-200">
                 <h3 className="text-sm font-semibold text-gray-700 mb-4">Privacy & Dati</h3>
                 <PrivacySettings onClearAllData={handleClearAllData} />
+              </div>
+              <div className="p-4 border-t border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-700 mb-4">Impostazioni Avanzate</h3>
+                <AdvancedSettings
+                  settings={settings}
+                  personalInfo={cvData.personalInfo}
+                  onSettingsChange={updateSettings}
+                />
               </div>
             </div>
           )}
