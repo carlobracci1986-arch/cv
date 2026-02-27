@@ -1,8 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import { CVData, defaultCVData } from '../types/cv.types';
 
-// Set up the worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Set up the worker using the bundled worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).href;
 
 /**
  * Extract text from PDF file
