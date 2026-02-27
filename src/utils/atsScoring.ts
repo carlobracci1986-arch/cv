@@ -1,5 +1,6 @@
 import { CVData, CVSettings } from '../types/cv.types';
 import { ATSScoreResult, ATSIssue } from '../types/ai.types';
+import Anthropic from '@anthropic-ai/sdk';
 
 export const calculateATSScore = (cvData: CVData, settings: CVSettings, jobKeywords?: string[]): ATSScoreResult => {
   const issues: ATSIssue[] = [];
@@ -119,3 +120,170 @@ export const calculateATSScore = (cvData: CVData, settings: CVSettings, jobKeywo
     keywordsMissing,
   };
 };
+
+/**
+ * Evaluate CV readability and ATS compatibility using Claude AI
+ * Provides intelligent feedback on CV structure, content, and ATS-friendliness
+ */
+export const evaluateATSWithClaude = async (
+  cvData: CVData,
+  settings: CVSettings,
+  jobKeywords?: string[]
+): Promise<ATSScoreResult> => {
+  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
+
+  if (!apiKey) {
+    throw new Error('Anthropic API key not configured. Please add VITE_ANTHROPIC_API_KEY to .env');
+  }
+
+  const client = new Anthropic({
+    apiKey,
+    defaultHeaders: {
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+  });
+
+  // Format CV data for Claude
+  const cvText = formatCVForAnalysis(cvData);
+
+  const prompt = `Analizza questo CV per la leggibilità ATS (Applicant Tracking System) e fornisci una valutazione dettagliata in formato JSON.
+
+CV:
+${cvText}
+
+${jobKeywords ? `Keywords dalla job description: ${jobKeywords.join(', ')}` : ''}
+
+Fornisci una risposta JSON con questa struttura esatta:
+{
+  "score": <numero 0-100>,
+  "level": "excellent" | "good" | "needs_improvement" | "poor",
+  "issues": [
+    {
+      "id": "unique-id",
+      "severity": "critical" | "warning" | "info",
+      "category": "content" | "formatting" | "keywords",
+      "message": "descrizione del problema",
+      "suggestion": "suggerimento per risolvere"
+    }
+  ],
+  "passedChecks": ["elemento 1", "elemento 2"],
+  "keywordsPresent": [${jobKeywords ? '"keyword1", "keyword2"' : ''}],
+  "keywordsMissing": [${jobKeywords ? '"keyword3"' : ''}]
+}
+
+Valuta:
+1. Completezza dei dati (nome, email, telefono)
+2. Chiarezza e struttura del contenuto
+3. Presenze di esperienze e formazione
+4. Qualità delle descrizioni
+5. Leggibilità per i sistemi ATS
+6. Corrispondenza con i keywords della job description (se forniti)
+7. Formatting compatibility con ATS
+
+Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
+
+  const message = await client.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 1024,
+    messages: [
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ],
+  });
+
+  // Extract JSON from response
+  const responseText = message.content[0].type === 'text' ? message.content[0].text : '';
+
+  // Parse JSON from response (handle markdown code blocks)
+  const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error('Failed to parse Claude response');
+  }
+
+  const result = JSON.parse(jsonMatch[0]) as ATSScoreResult;
+
+  return result;
+};
+
+/**
+ * Format CV data for Claude analysis
+ */
+function formatCVForAnalysis(cvData: CVData): string {
+  const { personalInfo, professionalSummary, experiences, education, skills, languages, other } = cvData;
+
+  let text = `DATI PERSONALI
+Nome: ${personalInfo.firstName} ${personalInfo.lastName}
+Email: ${personalInfo.email}
+Telefono: ${personalInfo.phone}
+Città: ${personalInfo.city}
+Paese: ${personalInfo.country}
+Data di Nascita: ${personalInfo.dateOfBirth}
+Titolo Professionale: ${personalInfo.jobTitle}
+
+`;
+
+  if (professionalSummary) {
+    text += `PROFILO PROFESSIONALE
+${professionalSummary}
+
+`;
+  }
+
+  if (experiences.length > 0) {
+    text += `ESPERIENZE LAVORATIVE
+`;
+    experiences.forEach((exp, i) => {
+      text += `${i + 1}. ${exp.position} @ ${exp.company} (${exp.location})
+   ${exp.startDate} - ${exp.endDate || (exp.currentlyWorking ? 'Presente' : '')}
+   ${exp.description}
+
+`;
+    });
+  }
+
+  if (education.length > 0) {
+    text += `FORMAZIONE
+`;
+    education.forEach((edu, i) => {
+      text += `${i + 1}. ${edu.degree} in ${edu.field}
+   ${edu.institution}
+   ${edu.startDate} - ${edu.endDate}
+   ${edu.description || ''}
+
+`;
+    });
+  }
+
+  if (skills.length > 0) {
+    text += `COMPETENZE
+`;
+    skills.forEach(skill => {
+      text += `- ${skill.name} (${skill.category})
+`;
+    });
+    text += '\n';
+  }
+
+  if (languages.length > 0) {
+    text += `LINGUE
+`;
+    languages.forEach(lang => {
+      text += `- ${lang.name}: ${lang.level}
+`;
+    });
+    text += '\n';
+  }
+
+  if (other.certifications.length > 0) {
+    text += `CERTIFICAZIONI
+`;
+    other.certifications.forEach(cert => {
+      text += `- ${cert.name} (${cert.issuer})
+`;
+    });
+  }
+
+  return text;
+}

@@ -38,7 +38,7 @@ import { MockInterviewSimulator } from '../components/AIFeatures/InterviewPrep/M
 
 import * as aiProvider from '../services/aiProvider';
 import { generatePDFFromElement, generateFilename } from '../utils/pdfGenerator';
-import { calculateATSScore } from '../utils/atsScoring';
+import { evaluateATSWithClaude } from '../utils/atsScoring';
 import { generateMockCVData } from '../services/mockDataGenerator';
 import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuestion, CoverLetterOptions } from '../types/ai.types';
 
@@ -143,13 +143,18 @@ export const Editor: React.FC = () => {
     toast.success(`${accepted.length} modifiche applicate!`);
   };
 
-  const handleCheckATS = () => {
+  const handleCheckATS = async () => {
     setIsCheckingATS(true);
-    setTimeout(() => {
-      const result = calculateATSScore(cvData, settings);
+    try {
+      const result = await evaluateATSWithClaude(cvData, settings);
       setAtsResult(result);
+      toast.success('Valutazione ATS completata con Claude AI!');
+    } catch (error) {
+      console.error('ATS evaluation error:', error);
+      toast.error('Errore nella valutazione ATS. Verifica la configurazione di Claude API.');
+    } finally {
       setIsCheckingATS(false);
-    }, 800);
+    }
   };
 
   const handleGenerateCoverLetter = (options: CoverLetterOptions) => {
