@@ -14,8 +14,9 @@ export const JobDescriptionInput: React.FC<Props> = ({
   onOptimize,
   isLoading,
 }) => {
-  const maxChars = 5000;
-  const charCount = jobDescription.length;
+  const maxChars = 10000;
+  // Count only non-whitespace characters for a more accurate count
+  const charCount = jobDescription.trim().length;
   const charPercentage = Math.min((charCount / maxChars) * 100, 100);
 
   return (
