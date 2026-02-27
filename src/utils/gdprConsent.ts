@@ -34,15 +34,6 @@ export function getGDPRConsentText(
       text = GDPR_CONSENT_TEXTS.standard;
   }
 
-  if (includeDate) {
-    const today = new Date().toLocaleDateString('it-IT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
-    text += `\n\nData: ${today}`;
-  }
-
   return text;
 }
 
