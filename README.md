@@ -1,129 +1,184 @@
-# CV Builder AI
+# CV Builder AI 🚀
 
-Un'applicazione web completa per creare curriculum vitae professionali con intelligenza artificiale integrata.
+Un'applicazione web moderna per creare, ottimizzare e gestire il tuo CV con l'intelligenza artificiale.
 
-## Funzionalità
+## ✨ Caratteristiche
 
-- **CV Builder Completo** - Form multi-sezione con preview in tempo reale
-- **5 Template Professionali** - Classic, Modern, Minimalist (+ Creative, Technical in sviluppo)
-- **Ottimizzazione AI** - Claude analizza la job description e ottimizza il tuo CV con diff interattivo
-- **ATS Score Checker** - Analisi compatibilità con sistemi ATS (Applicant Tracking Systems)
-- **Cover Letter Generator** - Lettere di presentazione personalizzate con tono selezionabile
-- **Interview Prep** - Domande probabili e mock interview con timer
-- **Esportazione PDF** - PDF professionale ad alta qualità
-- **Versioning** - Salva e gestisci multiple versioni del CV
-- **Privacy GDPR-Compliant** - Dati salvati solo in localStorage, nessun tracking
-- **Responsive** - Ottimizzato per desktop e mobile
+### 📋 Editor CV Completo
+- ✅ Form split-view (modulo + anteprima in tempo reale)
+- ✅ Template professionali (Classic, Modern, Minimalist)
+- ✅ Supporto foto profilo
+- ✅ Export PDF di alta qualità
 
-## Stack Tecnologico
+### 🤖 AI Features
+- **CV Optimizer**: Ottimizza il CV in base alla job description
+- **ATS Checker**: Valuta la compatibilità ATS del tuo CV
+- **Cover Letter Generator**: Genera lettere di presentazione personalizzate
+- **Interview Prep**: Prepara le risposte alle domande di colloquio
+- **Mock Interview**: Simula un colloquio con valutazione delle risposte
+- **CV Translator**: Traduce il CV in altre lingue
+
+### 🔄 Multi-Provider AI
+- 🤖 **Anthropic Claude** (default) - Modello: `claude-sonnet-4-20250514`
+- 🔮 **Google Gemini** - Modello: `gemini-2.0-flash`
+- 🌐 **OpenRouter** - Modello: `openai/gpt-oss-120b:free`
+
+Cambia provider modificando semplicemente il file `.env`!
+
+### 📊 Gestione Versioni
+- Salva più versioni del tuo CV
+- Duplica e confronta versioni
+- Carica/scarica versioni
+
+## 🛠️ Tecnologie
 
 - **Frontend**: React 18 + TypeScript
 - **Styling**: Tailwind CSS
 - **Build**: Vite
-- **AI**: Anthropic Claude API (`claude-sonnet-4-20250514`)
-- **PDF**: jsPDF + html2canvas
-- **State**: React Context + useState
-- **Routing**: React Router v6
 - **Animazioni**: Framer Motion
-- **Notifiche**: react-hot-toast
-- **Icone**: lucide-react
+- **PDF**: jsPDF + html2canvas
+- **UI Components**: Lucide React
 
-## Quick Start
+## 📦 Installazione
 
-### Prerequisiti
-- Node.js 18+
-- npm 9+
-- API key Anthropic (opzionale, solo per funzionalità AI)
+### 1. Clone il repository
+\`\`\`bash
+git clone https://github.com/carlobracci1986-arch/cv.git
+cd cv
+\`\`\`
 
-### Installazione
-
-```bash
-# 1. Entra nella cartella del progetto
-cd cv-builder
-
-# 2. Installa le dipendenze
+### 2. Installa le dipendenze
+\`\`\`bash
 npm install
+\`\`\`
 
-# 3. Crea il file .env (copia da .env.example)
+### 3. Configura le API
+Copia il file \`.env.example\` in \`.env\`:
+\`\`\`bash
 cp .env.example .env
+\`\`\`
 
-# 4. Inserisci la tua API key nel file .env
-# Modifica .env e inserisci: VITE_ANTHROPIC_API_KEY=sk-ant-api03-...
+Compila le variabili d'ambiente:
+\`\`\`env
+VITE_AI_PROVIDER=claude
 
-# 5. Avvia il server di sviluppo
+# Scegli uno di questi provider:
+VITE_ANTHROPIC_API_KEY=sk-ant-api03-...      # Claude
+VITE_GEMINI_API_KEY=AIzaSy...                # Gemini
+VITE_OPENROUTER_API_KEY=sk-or-v1-...         # OpenRouter
+\`\`\`
+
+## 🚀 Avvio
+
+### Development
+\`\`\`bash
 npm run dev
-```
+\`\`\`
+Apri \`http://localhost:3000\` nel browser
 
-L'app sarà disponibile su: **http://localhost:3000**
-
-### Configurazione API Key (Opzionale)
-
-Le funzionalità AI richiedono una API key di Anthropic:
-
-1. Vai su [console.anthropic.com](https://console.anthropic.com)
-2. Crea un account e genera una API key
-3. Copia la key nel file `.env`:
-   ```
-   VITE_ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
-   ```
-4. Riavvia il server (`npm run dev`)
-
-> **Nota**: Senza API key, tutte le funzionalità base (form, preview, PDF, versioning) funzionano normalmente. Solo le features AI (ottimizzazione, cover letter, interview prep) richiedono la key.
-
-## Struttura Progetto
-
-```
-src/
-├── components/
-│   ├── FormSections/      # Form di input CV
-│   ├── CVTemplates/       # Template visual (Classic, Modern, Minimalist)
-│   ├── AIFeatures/        # Ottimizzatore, ATS, Cover Letter, Interview Prep
-│   ├── VersionManager/    # Gestione versioni
-│   ├── Privacy/           # GDPR consent, privacy settings
-│   └── Layout/            # Header, Footer, Sidebar
-├── pages/                 # Editor, Privacy Policy, Terms, Cookie Policy
-├── contexts/              # CVContext, PrivacyContext
-├── services/              # Claude API service
-├── utils/                 # PDF generator, ATS scoring, localStorage
-└── types/                 # TypeScript interfaces
-```
-
-## Build per Produzione
-
-```bash
+### Build per produzione
+\`\`\`bash
 npm run build
-# Output in /dist - pronto per deploy su Vercel, Netlify, Cloudflare Pages
-```
+\`\`\`
 
-### Deploy su Vercel
+## 📖 Setup Dettagliato
 
-```bash
-npm install -g vercel
-vercel --prod
-```
+### Per Anthropic Claude
+1. Vai su: https://console.anthropic.com
+2. Crea una nuova API key
+3. Aggiungi al \`.env\`:
+\`\`\`env
+VITE_AI_PROVIDER=claude
+VITE_ANTHROPIC_API_KEY=sk-ant-api03-...
+\`\`\`
 
-Aggiungi la variabile d'ambiente `VITE_ANTHROPIC_API_KEY` nelle impostazioni del progetto Vercel.
+### Per Google Gemini
+1. Vai su: https://aistudio.google.com/apikey
+2. Crea una nuova API key
+3. Aggiungi al \`.env\`:
+\`\`\`env
+VITE_AI_PROVIDER=gemini
+VITE_GEMINI_API_KEY=AIzaSy...
+\`\`\`
 
-## Privacy & GDPR
+### Per OpenRouter
+1. Vai su: https://openrouter.ai/keys
+2. Crea una nuova API key
+3. Aggiungi al \`.env\`:
+\`\`\`env
+VITE_AI_PROVIDER=openrouter
+VITE_OPENROUTER_API_KEY=sk-or-v1-...
+\`\`\`
 
-- Tutti i dati del CV sono salvati **esclusivamente** nel localStorage del browser
-- **Nessun server backend** - zero dati inviati a server propri
-- Chiamate API Anthropic avvengono **solo con consenso esplicito**
-- **Nessun cookie** di tracking o analytics
-- Diritto all'oblio: "Cancella tutti i dati" nelle Impostazioni
-- Privacy Policy completa disponibile in-app e su `/privacy-policy`
+Per dettagli completi, leggi [SETUP_GEMINI.md](./SETUP_GEMINI.md)
 
-## Sicurezza
+## 🏗️ Struttura del Progetto
 
-- API key **non esposta** in commit (`.env` in `.gitignore`)
-- Input sanitizzati prima della visualizzazione
-- HTTPS obbligatorio in produzione
-- Nessuna dipendenza con vulnerabilità critiche note
+\`\`\`
+src/
+├── components/           # Componenti React
+│   ├── AIFeatures/      # Funzionalità AI
+│   ├── FormSections/    # Form CV
+│   ├── CVTemplates/     # Template CV
+│   └── Layout/          # Layout
+├── pages/               # Pagine principali
+├── services/            # Servizi API
+│   ├── aiProvider.ts    # Provider switcher
+│   ├── claudeAPI.ts     # Claude integration
+│   ├── geminiAPI.ts     # Gemini integration
+│   └── openrouterAPI.ts # OpenRouter integration
+├── types/               # TypeScript types
+├── utils/               # Utilities
+├── contexts/            # React contexts
+└── hooks/              # Custom hooks
+\`\`\`
 
-## Licenza
+## 🔐 Sicurezza
 
-MIT License - Vedi file LICENSE per dettagli
+- ✅ API keys **mai committate** (protette da \`.gitignore\`)
+- ✅ Consensi GDPR gestiti localmente
+- ✅ Nessun dato persistente su server
+- ✅ LocalStorage per backup locale
+
+## 🚄 CI/CD
+
+Il progetto usa **GitHub Actions** per:
+- ✅ Build automatico ad ogni push
+- ✅ Deploy automatico su GitHub Pages
+- ✅ Controllo di qualità
+
+Visualizza i workflow in: https://github.com/carlobracci1986-arch/cv/actions
+
+## 🐛 Troubleshooting
+
+### Errore API
+- Verifica che le API keys siano corrette nel \`.env\`
+- Assicurati di avere quota disponibile
+- Controlla la console del browser (F12) per dettagli
+
+### Errore Build
+\`\`\`bash
+# Pulisci e reinstalla
+rm -rf node_modules package-lock.json
+npm install
+npm run build
+\`\`\`
+
+## 📄 Licenza
+
+MIT License
+
+## 🤝 Contribuisci
+
+Le pull request sono benvenute!
+
+## 🙏 Ringraziamenti
+
+- Anthropic Claude
+- Google Gemini
+- OpenRouter
+- React & Vite community
 
 ---
 
-Sviluppato con Claude Code AI
+**Fatto con ❤️ per facilitare la ricerca di lavoro**
