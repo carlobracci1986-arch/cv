@@ -62,6 +62,16 @@ export interface Certification {
   url?: string;
 }
 
+export type GDPRConsentType = 'minimal' | 'standard' | 'extended' | 'complete' | 'custom';
+
+export interface ProtectedCategory {
+  belongsToProtectedCategory: boolean;
+  categoryType?: 'art1' | 'art18' | 'altra';
+  categoryTypeOther?: string;
+  disabilityPercentage?: number;
+  details?: string;
+}
+
 export interface CVData {
   personalInfo: PersonalInfo;
   professionalSummary: string;
@@ -70,6 +80,7 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certifications: Certification[];
+  protectedCategory?: ProtectedCategory;
   hobbies: string[];
 }
 
@@ -94,9 +105,15 @@ export interface CVSettings {
     languages: boolean;
     certifications: boolean;
     hobbies: boolean;
+    protectedCategory: boolean;
   };
   sectionOrder: string[];
   language: LanguageCode;
+  // GDPR settings
+  gdprConsentType: GDPRConsentType;
+  customGdprText?: string;
+  includeConsentDate: boolean;
+  includeSignature: boolean;
 }
 
 export interface CVVersion {
@@ -135,6 +152,9 @@ export const defaultCVData: CVData = {
   skills: [],
   languages: [],
   certifications: [],
+  protectedCategory: {
+    belongsToProtectedCategory: false,
+  },
   hobbies: [],
 };
 
@@ -153,7 +173,12 @@ export const defaultSettings: CVSettings = {
     languages: true,
     certifications: true,
     hobbies: false,
+    protectedCategory: false,
   },
   sectionOrder: ['professionalSummary', 'experiences', 'education', 'skills', 'languages', 'certifications', 'hobbies'],
   language: 'it',
+  gdprConsentType: 'standard',
+  customGdprText: undefined,
+  includeConsentDate: true,
+  includeSignature: false,
 };
