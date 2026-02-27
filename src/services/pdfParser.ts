@@ -1,9 +1,9 @@
 import * as pdfjsLib from 'pdfjs-dist';
 import { CVData, defaultCVData } from '../types/cv.types';
 
-// Set up the worker - use the correct path for both dev and production
+// Set up the worker - use the same version as the library
 if (typeof window !== 'undefined') {
-  const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+  const workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.624/pdf.worker.min.mjs`;
   pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
 }
 
