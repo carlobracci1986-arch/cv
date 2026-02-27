@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
             <span>© 2024 CV Builder AI - GDPR Compliant</span>
             <div className="flex items-center gap-1 text-xs text-gray-400 font-mono">
               <span>({BUILD_VERSION})</span>
-              {BUILD_COMMIT !== 'unknown' && (
+              {BUILD_COMMIT && BUILD_COMMIT.length > 6 && (
                 <>
                   <span>·</span>
                   <GitBranch className="w-3 h-3" />
