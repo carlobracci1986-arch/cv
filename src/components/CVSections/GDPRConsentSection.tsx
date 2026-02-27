@@ -41,13 +41,7 @@ export const GDPRConsentSection: React.FC<Props> = ({
           <div className="signature-container">
             <div className="signature-item">
               <p className="signature-label">Luogo e Data</p>
-              <div className="signature-line">
-                {includeConsentDate && (
-                  <span className="signature-date">
-                    {personalInfo.city || '_______'}, {new Date().toLocaleDateString('it-IT')}
-                  </span>
-                )}
-              </div>
+              <div className="signature-line"></div>
             </div>
             <div className="signature-item">
               <p className="signature-label">Firma</p>
