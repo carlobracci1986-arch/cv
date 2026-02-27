@@ -5,18 +5,14 @@
  * This script runs before every build to update src/version.ts
  */
 
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
 
 try {
   // Get git information
   let commitCount = '0';
   let commitHash = 'unknown';
-  let commitDate = new Date().toISOString().split('T')[0];
 
   try {
     // Get total commit count (version number)
@@ -42,7 +38,7 @@ try {
   const newContent = `/**
  * Build Version (Auto-generated)
  * Updated automatically based on git commit count
- * Script: scripts/update-version.js
+ * Script: scripts/update-version.cjs
  */
 export const BUILD_VERSION = '${version}';
 export const BUILD_DATE = new Date().toLocaleDateString('it-IT');
