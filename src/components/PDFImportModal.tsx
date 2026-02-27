@@ -1,8 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { FileUp, X, Loader } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { CVData } from '../../types/cv.types';
-import { extractTextFromPDF, parseCVText } from '../../services/pdfParser';
+import { CVData } from '../types/cv.types';
+import { extractTextFromPDF, parseCVText } from '../services/pdfParser';
 
 interface Props {
   isOpen: boolean;
