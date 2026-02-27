@@ -15,6 +15,7 @@ import { ExperienceForm } from '../components/FormSections/Experience';
 import { EducationForm } from '../components/FormSections/Education';
 import { SkillsForm } from '../components/FormSections/Skills';
 import { CertificationsForm } from '../components/FormSections/Certifications';
+import { LicensesAndProtections } from '../components/FormSections/LicensesAndProtections';
 import { PhotoUpload } from '../components/FormSections/PhotoUpload';
 import { ProfessionalSummary } from '../components/FormSections/ProfessionalSummary';
 
@@ -39,7 +40,7 @@ import { calculateATSScore } from '../utils/atsScoring';
 import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuestion, CoverLetterOptions } from '../types/ai.types';
 
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
-type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications';
+type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications' | 'licenses';
 type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview';
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string }[] = [
@@ -48,7 +49,8 @@ const EDITOR_SECTIONS: { id: EditorSection; label: string }[] = [
   { id: 'experience', label: 'Esperienze' },
   { id: 'education', label: 'Formazione' },
   { id: 'skills', label: 'Competenze' },
-  { id: 'certifications', label: 'Altro' },
+  { id: 'certifications', label: 'Certificazioni' },
+  { id: 'licenses', label: 'Patenti & Protezioni' },
 ];
 
 export const Editor: React.FC = () => {
@@ -336,6 +338,14 @@ export const Editor: React.FC = () => {
                         hobbies={cvData.hobbies}
                         onCertificationsChange={certifications => updateCVData({ certifications })}
                         onHobbiesChange={hobbies => updateCVData({ hobbies })}
+                      />
+                    )}
+                    {editorSection === 'licenses' && (
+                      <LicensesAndProtections
+                        drivingLicenses={cvData.drivingLicenses}
+                        protectedCategory={cvData.protectedCategory}
+                        onDrivingLicensesChange={drivingLicenses => updateCVData({ drivingLicenses })}
+                        onProtectedCategoryChange={protectedCategory => updateCVData({ protectedCategory })}
                       />
                     )}
                   </motion.div>

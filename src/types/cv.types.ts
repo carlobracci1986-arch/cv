@@ -62,6 +62,22 @@ export interface Certification {
   url?: string;
 }
 
+export type DrivingLicenseCategory = 'AM' | 'A1' | 'A2' | 'A' | 'B1' | 'B' | 'C1' | 'C' | 'D1' | 'D' | 'BE' | 'C1E' | 'CE' | 'D1E' | 'DE';
+
+export interface DrivingLicense {
+  id: string;
+  categories: DrivingLicenseCategory[];
+  releaseDate: string;
+  expiryDate?: string;
+}
+
+export type ProtectedCategory = 'none' | 'law_104' | 'ethnic_minority' | 'other';
+
+export interface ProtectedCategoryInfo {
+  category: ProtectedCategory;
+  description?: string;
+}
+
 export interface CVData {
   personalInfo: PersonalInfo;
   professionalSummary: string;
@@ -70,7 +86,10 @@ export interface CVData {
   skills: Skill[];
   languages: Language[];
   certifications: Certification[];
+  drivingLicenses: DrivingLicense[];
+  protectedCategory: ProtectedCategoryInfo;
   hobbies: string[];
+  gdprConsent: boolean; // Consenso al trattamento dei dati
 }
 
 export type TemplateType = 'classic' | 'modern' | 'minimalist' | 'creative' | 'technical';
@@ -93,6 +112,8 @@ export interface CVSettings {
     skills: boolean;
     languages: boolean;
     certifications: boolean;
+    drivingLicenses: boolean;
+    protectedCategory: boolean;
     hobbies: boolean;
   };
   sectionOrder: string[];
@@ -135,7 +156,10 @@ export const defaultCVData: CVData = {
   skills: [],
   languages: [],
   certifications: [],
+  drivingLicenses: [],
+  protectedCategory: { category: 'none' },
   hobbies: [],
+  gdprConsent: false,
 };
 
 export const defaultSettings: CVSettings = {
@@ -152,8 +176,10 @@ export const defaultSettings: CVSettings = {
     skills: true,
     languages: true,
     certifications: true,
+    drivingLicenses: false,
+    protectedCategory: false,
     hobbies: false,
   },
-  sectionOrder: ['professionalSummary', 'experiences', 'education', 'skills', 'languages', 'certifications', 'hobbies'],
+  sectionOrder: ['professionalSummary', 'experiences', 'education', 'skills', 'languages', 'certifications', 'drivingLicenses', 'protectedCategory', 'hobbies'],
   language: 'it',
 };
