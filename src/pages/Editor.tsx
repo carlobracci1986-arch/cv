@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Download, Sparkles, ChevronLeft, ChevronRight,
-  Palette, FolderOpen, Settings, Brain
+  Palette, FolderOpen, Settings, Brain, Wand2
 } from 'lucide-react';
 
 import { useCV } from '../contexts/CVContext';
@@ -39,6 +39,7 @@ import { MockInterviewSimulator } from '../components/AIFeatures/InterviewPrep/M
 import * as aiProvider from '../services/aiProvider';
 import { generatePDFFromElement, generateFilename } from '../utils/pdfGenerator';
 import { calculateATSScore } from '../utils/atsScoring';
+import { generateMockCVData } from '../services/mockDataGenerator';
 import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuestion, CoverLetterOptions } from '../types/ai.types';
 
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
@@ -252,6 +253,25 @@ export const Editor: React.FC = () => {
           <PDFImportButton
             onImport={(importedData) => updateCVData(importedData)}
           />
+
+          {/* Mock Data Generator */}
+          <button
+            onClick={() => {
+              const mockData = generateMockCVData();
+              updateCVData(mockData);
+              toast.success('Dati di test generati!');
+              addActivity({
+                action: 'cv_updated',
+                details: 'Mock data generated for testing',
+                requiresConsent: false
+              });
+            }}
+            title="Genera dati random per testare"
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Wand2 className="h-4 w-4" />
+            <span className="hidden sm:inline">Test Data</span>
+          </button>
 
           <button
             onClick={handleDownloadPDF}
