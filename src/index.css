@@ -64,3 +64,6 @@
     transform: none !important;
   }
 }
+
+/* Import CV Sections styles */
+@import './styles/cvSections.css';

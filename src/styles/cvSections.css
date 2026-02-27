@@ -1,0 +1,171 @@
+/* CV Sections Styling */
+
+/* Base Section Styles */
+.cv-section {
+  margin-top: 1.5rem;
+  page-break-inside: avoid;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 0.25rem;
+}
+
+.section-content {
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* Protected Category Section */
+.cv-section.protected-category {
+  margin-top: 1.5rem;
+}
+
+.protected-category .section-content p {
+  margin-bottom: 0.5rem;
+}
+
+.protected-category ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.protected-category li {
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.protected-category strong {
+  font-weight: 600;
+  color: #374151;
+}
+
+/* GDPR Consent Section */
+.cv-section.gdpr-consent {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  page-break-inside: avoid;
+  border-top: 1px solid #e5e7eb;
+}
+
+.gdpr-text {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #6b7280;
+  text-align: justify;
+  word-break: break-word;
+}
+
+.gdpr-text p {
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+.gdpr-text p:first-child {
+  margin-top: 0;
+}
+
+/* Signature Field */
+.signature-field {
+  margin-top: 1.5rem;
+}
+
+.signature-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+}
+
+.signature-item {
+  flex: 1;
+}
+
+.signature-label {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.signature-line {
+  border-bottom: 1px solid #374151;
+  min-height: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 0.25rem;
+  position: relative;
+}
+
+.signature-date {
+  font-size: 0.7rem;
+  color: #374151;
+  padding-left: 0.25rem;
+}
+
+/* Print-specific styles */
+@media print {
+  .cv-section {
+    page-break-inside: avoid;
+  }
+
+  .cv-section.gdpr-consent {
+    page-break-before: auto;
+  }
+
+  .gdpr-text {
+    text-align: justify;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+
+  .signature-line {
+    border-bottom: 0.5pt solid #000;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .cv-section {
+    margin-top: 1rem;
+  }
+
+  .signature-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .signature-item {
+    width: 100%;
+  }
+
+  .signature-line {
+    min-height: 2rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .cv-section.gdpr-consent {
+    border-top-color: #4b5563;
+  }
+
+  .gdpr-text {
+    color: #d1d5db;
+  }
+
+  .signature-label {
+    color: #9ca3af;
+  }
+
+  .signature-date {
+    color: #e5e7eb;
+  }
+}

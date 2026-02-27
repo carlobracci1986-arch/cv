@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 import { CVData } from '../types/cv.types';
 import { OptimizationResult, CoverLetterOptions, InterviewPrepResult } from '../types/ai.types';
+import { sanitizeDataForAPI } from '../utils/gdprConsent';
 
 const getApiKey = (): string => {
   const key = import.meta.env.VITE_ANTHROPIC_API_KEY;
@@ -43,13 +44,16 @@ const parseJSON = <T>(text: string): T => {
 };
 
 export const optimizeCV = async (cvData: CVData, jobDescription: string): Promise<OptimizationResult> => {
+  // Sanitize sensitive data before sending to API
+  const sanitizedCV = sanitizeDataForAPI(cvData);
+
   const prompt = `Sei un esperto recruiter e career coach italiano. Analizza questo CV e ottimizzalo per la seguente offerta di lavoro.
 
 JOB DESCRIPTION:
 ${jobDescription}
 
 CV ATTUALE (JSON):
-${JSON.stringify(cvData, null, 2)}
+${JSON.stringify(sanitizedCV, null, 2)}
 
 COMPITO:
 1. Analizza le keyword e competenze richieste nella job description
