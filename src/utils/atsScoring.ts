@@ -132,8 +132,16 @@ export const evaluateATSWithClaude = async (
 ): Promise<ATSScoreResult> => {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
+  console.log('ATS Evaluation - API Key configured:', !!apiKey);
+  console.log('Environment variables:', {
+    hasKey: !!apiKey,
+    provider: import.meta.env.VITE_AI_PROVIDER,
+  });
+
   if (!apiKey) {
-    throw new Error('API key Anthropic non configurata. Aggiungi VITE_ANTHROPIC_API_KEY nel file .env');
+    const error = 'API key Anthropic non configurata. Aggiungi VITE_ANTHROPIC_API_KEY nel file .env';
+    console.error(error);
+    throw new Error(error);
   }
 
   // Format CV data for Claude
@@ -176,6 +184,8 @@ Valuta:
 Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
 
   try {
+    console.log('Fetching ATS evaluation from Claude...');
+
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -191,25 +201,37 @@ Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
       }),
     });
 
+    console.log('API Response status:', response.status, response.statusText);
+
     if (!response.ok) {
       const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
-      throw new Error(err.error?.message || `API error: ${response.status}`);
+      const errorMsg = err.error?.message || `API error: ${response.status}`;
+      console.error('API Error:', errorMsg);
+      throw new Error(errorMsg);
     }
 
     const data = await response.json();
+    console.log('API Response received:', !!data.content);
+
     const responseText = data.content[0].text;
+    console.log('Claude response (first 200 chars):', responseText.substring(0, 200));
 
     // Parse JSON from response (handle markdown code blocks)
     const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || responseText.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error('Failed to parse JSON from response:', responseText);
       throw new Error('Failed to parse Claude response');
     }
 
     const jsonStr = jsonMatch[1] || jsonMatch[0];
+    console.log('Parsed JSON (first 200 chars):', jsonStr.substring(0, 200));
+
     const result = JSON.parse(jsonStr) as ATSScoreResult;
+    console.log('ATS Evaluation completed successfully');
 
     return result;
   } catch (error) {
+    console.error('ATS Evaluation error:', error);
     if (error instanceof Error) {
       throw error;
     }
