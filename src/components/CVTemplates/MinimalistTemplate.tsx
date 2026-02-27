@@ -25,7 +25,7 @@ const languageLevelFull: Record<string, string> = {
 };
 
 export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
-  const { personalInfo, professionalSummary, experiences, education, skills, languages, certifications, hobbies } = cvData;
+  const { personalInfo, professionalSummary, experiences, education, skills, languages, other } = cvData;
   const { accentColor, fontSize, spacing, showSections, sectionOrder } = settings;
 
   const baseFontSize = fontSizeMap[fontSize];
@@ -194,12 +194,12 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
       </section>
     ) : null,
 
-    certifications: showSections.certifications && certifications.length > 0 ? (
+    certifications: showSections.certifications && other.certifications.length > 0 ? (
       <section key="certifications">
         {thinRule}
         {sectionTitle('Certificazioni')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {certifications.map(cert => (
+          {other.certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
               <div style={{ fontSize: baseFontSize }}>
                 <span style={{ fontWeight: 600, color: '#111827' }}>{cert.name}</span>
@@ -215,12 +215,30 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
       </section>
     ) : null,
 
-    hobbies: showSections.hobbies && hobbies.length > 0 ? (
+    drivingLicenses: showSections.drivingLicenses && other.drivingLicenses.length > 0 ? (
+      <section key="drivingLicenses">
+        {thinRule}
+        {sectionTitle('Patenti')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {other.drivingLicenses.map(license => (
+            <div key={license.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
+              <span style={{ fontSize: baseFontSize, fontWeight: 600, color: '#111827' }}>{license.licenseType}</span>
+              <span style={{ fontSize: '12px', color: '#9ca3af', fontWeight: 300, whiteSpace: 'nowrap' }}>
+                {license.issuingDate && formatDate(license.issuingDate)}
+                {license.expiryDate && ` — ${formatDate(license.expiryDate)}`}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+    ) : null,
+
+    hobbies: showSections.hobbies && other.hobbies.length > 0 ? (
       <section key="hobbies">
         {thinRule}
         {sectionTitle('Interessi')}
         <p style={{ fontSize: baseFontSize, color: '#4b5563', fontWeight: 300, margin: 0, lineHeight: 1.6 }}>
-          {hobbies.join(' · ')}
+          {other.hobbies.join(' · ')}
         </p>
       </section>
     ) : null,

@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Award, ChevronDown, ChevronUp, GripVertical, X, Heart } from 'lucide-react';
-import { Certification } from '../../types/cv.types';
+import { Plus, Trash2, Award, ChevronDown, ChevronUp, GripVertical, X, Heart, Car } from 'lucide-react';
+import { Certification, DrivingLicense, OtherSection } from '../../types/cv.types';
 import { nanoid } from '../../utils/nanoid';
 
 interface Props {
-  certifications: Certification[];
-  hobbies: string[];
-  onCertificationsChange: (certifications: Certification[]) => void;
-  onHobbiesChange: (hobbies: string[]) => void;
+  data: OtherSection;
+  onChange: (data: OtherSection) => void;
 }
 
-export const CertificationsForm: React.FC<Props> = ({
-  certifications,
-  hobbies,
-  onCertificationsChange,
-  onHobbiesChange,
-}) => {
+export const OtherSectionsForm: React.FC<Props> = ({ data, onChange }) => {
   const [expandedId, setExpandedId] = useState<string | null>(
-    certifications.length > 0 ? certifications[0].id : null
+    data.certifications.length > 0 ? data.certifications[0].id : null
   );
   const [hobbyInput, setHobbyInput] = useState('');
+  const [expandedLicenseId, setExpandedLicenseId] = useState<string | null>(
+    data.drivingLicenses.length > 0 ? data.drivingLicenses[0].id : null
+  );
 
+  // Certificazioni
   const addCertification = () => {
     const newCert: Certification = {
       id: nanoid(),
@@ -30,29 +27,47 @@ export const CertificationsForm: React.FC<Props> = ({
       expiryDate: '',
       url: '',
     };
-    onCertificationsChange([...certifications, newCert]);
+    onChange({
+      ...data,
+      certifications: [...data.certifications, newCert],
+    });
     setExpandedId(newCert.id);
   };
 
   const updateCertification = (id: string, updates: Partial<Certification>) => {
-    onCertificationsChange(certifications.map(c => c.id === id ? { ...c, ...updates } : c));
+    onChange({
+      ...data,
+      certifications: data.certifications.map(c =>
+        c.id === id ? { ...c, ...updates } : c
+      ),
+    });
   };
 
   const removeCertification = (id: string) => {
-    onCertificationsChange(certifications.filter(c => c.id !== id));
+    onChange({
+      ...data,
+      certifications: data.certifications.filter(c => c.id !== id),
+    });
     if (expandedId === id) setExpandedId(null);
   };
 
+  // Hobby
   const addHobby = (value: string) => {
     const trimmed = value.trim();
     if (!trimmed) return;
-    if (hobbies.some(h => h.toLowerCase() === trimmed.toLowerCase())) return;
-    onHobbiesChange([...hobbies, trimmed]);
+    if (data.hobbies.some(h => h.toLowerCase() === trimmed.toLowerCase())) return;
+    onChange({
+      ...data,
+      hobbies: [...data.hobbies, trimmed],
+    });
     setHobbyInput('');
   };
 
   const removeHobby = (hobby: string) => {
-    onHobbiesChange(hobbies.filter(h => h !== hobby));
+    onChange({
+      ...data,
+      hobbies: data.hobbies.filter(h => h !== hobby),
+    });
   };
 
   const handleHobbyKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -62,12 +77,44 @@ export const CertificationsForm: React.FC<Props> = ({
     }
   };
 
+  // Patenti
+  const addDrivingLicense = () => {
+    const newLicense: DrivingLicense = {
+      id: nanoid(),
+      licenseType: '',
+      issuingDate: '',
+      expiryDate: '',
+    };
+    onChange({
+      ...data,
+      drivingLicenses: [...data.drivingLicenses, newLicense],
+    });
+    setExpandedLicenseId(newLicense.id);
+  };
+
+  const updateDrivingLicense = (id: string, updates: Partial<DrivingLicense>) => {
+    onChange({
+      ...data,
+      drivingLicenses: data.drivingLicenses.map(l =>
+        l.id === id ? { ...l, ...updates } : l
+      ),
+    });
+  };
+
+  const removeDrivingLicense = (id: string) => {
+    onChange({
+      ...data,
+      drivingLicenses: data.drivingLicenses.filter(l => l.id !== id),
+    });
+    if (expandedLicenseId === id) setExpandedLicenseId(null);
+  };
+
   const inputClass = "w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent";
   const labelClass = "block text-xs font-medium text-gray-600 mb-1";
 
   return (
     <div className="space-y-6">
-      {/* Certifications Section */}
+      {/* Certificazioni Section */}
       <div>
         <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
           <Award className="h-4 w-4" />
@@ -75,14 +122,14 @@ export const CertificationsForm: React.FC<Props> = ({
         </h4>
 
         <div className="space-y-3">
-          {certifications.length === 0 && (
+          {data.certifications.length === 0 && (
             <div className="text-center py-8 text-gray-400">
               <Award className="h-10 w-10 mx-auto mb-2 opacity-40" />
               <p className="text-sm">Nessuna certificazione aggiunta</p>
             </div>
           )}
 
-          {certifications.map((cert) => (
+          {data.certifications.map((cert) => (
             <div key={cert.id} className="border border-gray-200 rounded-lg overflow-hidden">
               <div
                 className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100"
@@ -147,7 +194,7 @@ export const CertificationsForm: React.FC<Props> = ({
 
                   <div>
                     <label className={labelClass}>URL / Link di Verifica</label>
-                    <input type="url" value={cert.url}
+                    <input type="url" value={cert.url ?? ''}
                       onChange={e => updateCertification(cert.id, { url: e.target.value })}
                       className={inputClass} placeholder="https://credentials.example.com/verify/..." />
                   </div>
@@ -160,6 +207,85 @@ export const CertificationsForm: React.FC<Props> = ({
             className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600 transition-colors flex items-center justify-center gap-2">
             <Plus className="h-4 w-4" />
             Aggiungi Certificazione
+          </button>
+        </div>
+      </div>
+
+      {/* Patenti Section */}
+      <div className="border-t pt-5">
+        <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <Car className="h-4 w-4" />
+          Patenti
+        </h4>
+
+        <div className="space-y-3">
+          {data.drivingLicenses.length === 0 && (
+            <div className="text-center py-8 text-gray-400">
+              <Car className="h-10 w-10 mx-auto mb-2 opacity-40" />
+              <p className="text-sm">Nessuna patente aggiunta</p>
+            </div>
+          )}
+
+          {data.drivingLicenses.map((license) => (
+            <div key={license.id} className="border border-gray-200 rounded-lg overflow-hidden">
+              <div
+                className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                onClick={() => setExpandedLicenseId(expandedLicenseId === license.id ? null : license.id)}
+              >
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <GripVertical className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {license.licenseType || 'Nuova Patente'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={e => { e.stopPropagation(); removeDrivingLicense(license.id); }}
+                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    title="Rimuovi"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  {expandedLicenseId === license.id
+                    ? <ChevronUp className="h-4 w-4 text-gray-400" />
+                    : <ChevronDown className="h-4 w-4 text-gray-400" />}
+                </div>
+              </div>
+
+              {expandedLicenseId === license.id && (
+                <div className="p-4 space-y-3">
+                  <div>
+                    <label className={labelClass}>Tipologia Patente <span className="text-red-500">*</span></label>
+                    <input type="text" value={license.licenseType}
+                      onChange={e => updateDrivingLicense(license.id, { licenseType: e.target.value })}
+                      className={inputClass} placeholder="es. Patente B, Patente D, ecc." />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className={labelClass}>Data Conseguimento</label>
+                      <input type="month" value={license.issuingDate ?? ''}
+                        onChange={e => updateDrivingLicense(license.id, { issuingDate: e.target.value })}
+                        className={inputClass} />
+                    </div>
+                    <div>
+                      <label className={labelClass}>Data Scadenza</label>
+                      <input type="month" value={license.expiryDate ?? ''}
+                        onChange={e => updateDrivingLicense(license.id, { expiryDate: e.target.value })}
+                        className={inputClass} placeholder="Opzionale" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+
+          <button onClick={addDrivingLicense}
+            className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-sm text-gray-500 hover:border-primary-400 hover:text-primary-600 transition-colors flex items-center justify-center gap-2">
+            <Plus className="h-4 w-4" />
+            Aggiungi Patente
           </button>
         </div>
       </div>
@@ -190,9 +316,9 @@ export const CertificationsForm: React.FC<Props> = ({
           </button>
         </div>
 
-        {hobbies.length > 0 ? (
+        {data.hobbies.length > 0 ? (
           <div className="flex flex-wrap gap-2">
-            {hobbies.map(hobby => (
+            {data.hobbies.map(hobby => (
               <span
                 key={hobby}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-50 text-primary-700 rounded-full text-sm font-medium border border-primary-200 group"

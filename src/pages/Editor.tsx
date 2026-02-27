@@ -14,7 +14,7 @@ import { PersonalInfoForm } from '../components/FormSections/PersonalInfo';
 import { ExperienceForm } from '../components/FormSections/Experience';
 import { EducationForm } from '../components/FormSections/Education';
 import { SkillsForm } from '../components/FormSections/Skills';
-import { CertificationsForm } from '../components/FormSections/Certifications';
+import { OtherSectionsForm } from '../components/FormSections/OtherSections';
 import { ProtectedCategoryForm } from '../components/FormSections/ProtectedCategory';
 import { PhotoUpload } from '../components/FormSections/PhotoUpload';
 import { ProfessionalSummary } from '../components/FormSections/ProfessionalSummary';
@@ -41,7 +41,7 @@ import { calculateATSScore } from '../utils/atsScoring';
 import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuestion, CoverLetterOptions } from '../types/ai.types';
 
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
-type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'certifications' | 'protected';
+type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'other' | 'protected';
 type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview';
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string }[] = [
@@ -50,7 +50,7 @@ const EDITOR_SECTIONS: { id: EditorSection; label: string }[] = [
   { id: 'experience', label: 'Esperienze' },
   { id: 'education', label: 'Formazione' },
   { id: 'skills', label: 'Competenze' },
-  { id: 'certifications', label: 'Certificazioni' },
+  { id: 'other', label: 'Altro' },
   { id: 'protected', label: 'Categorie Protette' },
 ];
 
@@ -333,12 +333,10 @@ export const Editor: React.FC = () => {
                         onLanguagesChange={languages => updateCVData({ languages })}
                       />
                     )}
-                    {editorSection === 'certifications' && (
-                      <CertificationsForm
-                        certifications={cvData.certifications}
-                        hobbies={cvData.hobbies}
-                        onCertificationsChange={certifications => updateCVData({ certifications })}
-                        onHobbiesChange={hobbies => updateCVData({ hobbies })}
+                    {editorSection === 'other' && (
+                      <OtherSectionsForm
+                        data={cvData.other}
+                        onChange={other => updateCVData({ other })}
                       />
                     )}
                     {editorSection === 'protected' && (

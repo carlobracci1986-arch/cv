@@ -62,6 +62,19 @@ export interface Certification {
   url?: string;
 }
 
+export interface DrivingLicense {
+  id: string;
+  licenseType: string; // es: "Patente B", "Patente D", ecc.
+  issuingDate?: string;
+  expiryDate?: string;
+}
+
+export interface OtherSection {
+  certifications: Certification[];
+  hobbies: string[];
+  drivingLicenses: DrivingLicense[];
+}
+
 export type GDPRConsentType = 'minimal' | 'standard' | 'extended' | 'complete' | 'custom';
 
 export interface ProtectedCategory {
@@ -79,9 +92,8 @@ export interface CVData {
   education: Education[];
   skills: Skill[];
   languages: Language[];
-  certifications: Certification[];
+  other: OtherSection;
   protectedCategory?: ProtectedCategory;
-  hobbies: string[];
 }
 
 export type TemplateType = 'classic' | 'modern' | 'minimalist' | 'creative' | 'technical';
@@ -104,6 +116,7 @@ export interface CVSettings {
     skills: boolean;
     languages: boolean;
     certifications: boolean;
+    drivingLicenses: boolean;
     hobbies: boolean;
     protectedCategory: boolean;
   };
@@ -151,11 +164,14 @@ export const defaultCVData: CVData = {
   education: [],
   skills: [],
   languages: [],
-  certifications: [],
+  other: {
+    certifications: [],
+    hobbies: [],
+    drivingLicenses: [],
+  },
   protectedCategory: {
     belongsToProtectedCategory: false,
   },
-  hobbies: [],
 };
 
 export const defaultSettings: CVSettings = {
@@ -172,10 +188,11 @@ export const defaultSettings: CVSettings = {
     skills: true,
     languages: true,
     certifications: true,
+    drivingLicenses: false,
     hobbies: false,
     protectedCategory: false,
   },
-  sectionOrder: ['professionalSummary', 'experiences', 'education', 'skills', 'languages', 'certifications', 'hobbies'],
+  sectionOrder: ['professionalSummary', 'experiences', 'education', 'skills', 'languages', 'certifications', 'drivingLicenses', 'hobbies'],
   language: 'it',
   gdprConsentType: 'standard',
   customGdprText: undefined,

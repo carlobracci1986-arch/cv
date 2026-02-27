@@ -41,7 +41,7 @@ function darkenColor(hex: string, amount: number): string {
 }
 
 export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
-  const { personalInfo, professionalSummary, experiences, education, skills, languages, certifications, hobbies } = cvData;
+  const { personalInfo, professionalSummary, experiences, education, skills, languages, other } = cvData;
   const { accentColor, fontSize, spacing, showPhoto, showSections, sectionOrder } = settings;
 
   const baseFontSize = fontSizeMap[fontSize];
@@ -285,11 +285,11 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         )}
 
         {/* Hobbies */}
-        {showSections.hobbies && hobbies.length > 0 && (
+        {showSections.hobbies && other.hobbies.length > 0 && (
           <div>
             {sidebarSectionTitle('Interessi')}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-              {hobbies.map((hobby, i) => (
+              {other.hobbies.map((hobby, i) => (
                 <span key={i} style={{
                   fontSize: '11px',
                   padding: '2px 8px',
@@ -392,11 +392,11 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
       </section>
     ) : null,
 
-    certifications: showSections.certifications && certifications.length > 0 ? (
+    certifications: showSections.certifications && other.certifications.length > 0 ? (
       <section key="certifications" style={{ marginBottom: sectionGap }}>
         {mainSectionTitle('Certificazioni')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {certifications.map(cert => (
+          {other.certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
               <Award size={14} color={accent} style={{ flexShrink: 0, marginTop: '2px' }} />
               <div style={{ flex: 1 }}>
@@ -408,6 +408,28 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
                   <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>
                     {formatDate(cert.date)}
                     {cert.expiryDate && ` – ${formatDate(cert.expiryDate)}`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    ) : null,
+
+    drivingLicenses: showSections.drivingLicenses && other.drivingLicenses.length > 0 ? (
+      <section key="drivingLicenses" style={{ marginBottom: sectionGap }}>
+        {mainSectionTitle('Patenti')}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {other.drivingLicenses.map(license => (
+            <div key={license.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+              <Award size={14} color={accent} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px' }}>
+                  <span style={{ fontWeight: 600, fontSize: baseFontSize, color: '#111827' }}>{license.licenseType}</span>
+                  <span style={{ fontSize: '11px', color: '#6b7280', whiteSpace: 'nowrap' }}>
+                    {license.issuingDate && formatDate(license.issuingDate)}
+                    {license.expiryDate && ` – ${formatDate(license.expiryDate)}`}
                   </span>
                 </div>
               </div>

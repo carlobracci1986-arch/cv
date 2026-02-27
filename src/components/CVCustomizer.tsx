@@ -87,7 +87,8 @@ const SECTIONS: SectionToggle[] = [
   { key: 'skills', label: 'Competenze', mandatory: false },
   { key: 'languages', label: 'Lingue', mandatory: false },
   { key: 'certifications', label: 'Certificazioni', mandatory: false },
-  { key: 'hobbies', label: 'Hobby', mandatory: false },
+  { key: 'drivingLicenses', label: 'Patenti', mandatory: false },
+  { key: 'hobbies', label: 'Hobby & Interessi', mandatory: false },
 ];
 
 interface LangOption {
