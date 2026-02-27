@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield } from 'lucide-react';
-import { BUILD_VERSION } from '../../version';
+import { Shield, GitBranch } from 'lucide-react';
+import { BUILD_VERSION, BUILD_COMMIT } from '../../version';
 
 const LINKS = [
   { label: 'Privacy Policy', to: '/privacy-policy' },
@@ -18,7 +18,16 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
             <span>© 2024 CV Builder AI - GDPR Compliant</span>
-            <span className="text-xs text-gray-400 font-mono">({BUILD_VERSION})</span>
+            <div className="flex items-center gap-1 text-xs text-gray-400 font-mono">
+              <span>({BUILD_VERSION})</span>
+              {BUILD_COMMIT !== 'unknown' && (
+                <>
+                  <span>·</span>
+                  <GitBranch className="w-3 h-3" />
+                  <span>{BUILD_COMMIT}</span>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Links */}
