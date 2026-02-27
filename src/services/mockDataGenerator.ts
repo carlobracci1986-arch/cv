@@ -14,30 +14,33 @@ const lastNames = [
 ];
 
 const companies = [
-  'Accenture', 'Deloitte', 'EY', 'PwC', 'KPMG',
-  'Tim', 'Vodafone', 'Telecom Italia', 'Eni', 'Enel',
-  'Ferrero', 'Luxottica', 'Ferrari', 'Barilla', 'Pirelli'
+  'Accenture Italia', 'Deloitte', 'EY Italia', 'PwC Italia', 'KPMG',
+  'Tim', 'Vodafone Italia', 'Telecom Italia', 'Eni', 'Enel',
+  'Ferrero', 'Luxottica', 'Ferrari', 'Barilla', 'Pirelli',
+  'Leonardo', 'Thales Alenia Space', 'Intesa Sanpaolo'
 ];
 
 const positions = [
-  'Software Developer', 'Senior Developer', 'Junior Developer',
-  'Full Stack Developer', 'Frontend Developer', 'Backend Developer',
-  'Data Analyst', 'Business Analyst', 'Project Manager',
-  'Product Manager', 'QA Engineer', 'DevOps Engineer',
-  'Consulente', 'Responsabile IT', 'Coordinatore Progetti'
+  'Sviluppatore Software', 'Sviluppatore Senior', 'Sviluppatore Junior',
+  'Full Stack Developer', 'Sviluppatore Frontend', 'Sviluppatore Backend',
+  'Analista Dati', 'Business Analyst', 'Project Manager',
+  'Product Manager', 'Ingegnere QA', 'Ingegnere DevOps',
+  'Consulente IT', 'Responsabile IT', 'Coordinatore Progetti',
+  'Architetto Software', 'Specialista Cloud'
 ];
 
 const universities = [
   'Politecnico di Milano', 'Università Bocconi', 'Università Statale di Milano',
   'Sapienza Università di Roma', 'Università di Bologna', 'Politecnico di Torino',
-  'Università Cattolica', 'Università Commerciale Luigi Bocconi'
+  'Università Cattolica del Sacro Cuore', 'Università Commerciale Luigi Bocconi',
+  'Università di Padova', 'Università di Firenze'
 ];
 
 const degrees = [
   'Laurea in Informatica', 'Laurea in Ingegneria Informatica',
   'Laurea in Economia', 'Laurea in Ingegneria Gestionale',
-  'Laurea Magistrale in Informatica', 'Master in Business Administration',
-  'Laurea in Ingegneria Software'
+  'Laurea Magistrale in Informatica', 'Master in Amministrazione Aziendale',
+  'Laurea in Ingegneria del Software', 'Laurea in Scienze dell\'Informazione'
 ];
 
 const skills = [
@@ -49,35 +52,36 @@ const skills = [
   { name: 'Python', category: 'technical' as const },
   { name: 'Git', category: 'technical' as const },
   { name: 'Docker', category: 'technical' as const },
-  { name: 'REST API', category: 'technical' as const },
-  { name: 'Problem Solving', category: 'soft' as const },
+  { name: 'API REST', category: 'technical' as const },
+  { name: 'Risoluzione Problemi', category: 'soft' as const },
   { name: 'Leadership', category: 'soft' as const },
-  { name: 'Communication', category: 'soft' as const },
-  { name: 'Team Collaboration', category: 'soft' as const },
-  { name: 'Project Management', category: 'soft' as const },
-  { name: 'Analytical Thinking', category: 'soft' as const }
+  { name: 'Comunicazione', category: 'soft' as const },
+  { name: 'Lavoro di Gruppo', category: 'soft' as const },
+  { name: 'Gestione Progetti', category: 'soft' as const },
+  { name: 'Pensiero Analitico', category: 'soft' as const }
 ];
 
 const certifications = [
-  'AWS Solutions Architect',
-  'Google Cloud Professional',
-  'Scrum Master',
-  'ISO 27001',
-  'CompTIA Security+',
-  'Microsoft Azure Administrator'
+  'AWS Solutions Architect Associate',
+  'Google Cloud Professional Data Engineer',
+  'Scrum Master Certificato',
+  'ISO 27001 Information Security Manager',
+  'Microsoft Azure Administrator',
+  'Certificazione Kubernetes'
 ];
 
 const languages = [
   { name: 'Italiano', level: 'Native' as const },
   { name: 'Inglese', level: 'C1' as const },
   { name: 'Francese', level: 'B1' as const },
-  { name: 'Spagnolo', level: 'A2' as const },
+  { name: 'Spagnolo', level: 'B1' as const },
   { name: 'Tedesco', level: 'B2' as const }
 ];
 
 const cities = [
   'Milano', 'Roma', 'Torino', 'Bologna', 'Firenze',
-  'Palermo', 'Napoli', 'Genova', 'Venezia', 'Verona'
+  'Palermo', 'Napoli', 'Genova', 'Venezia', 'Verona',
+  'Brescia', 'Pisa', 'Rimini'
 ];
 
 function randomElement<T>(arr: T[]): T {
@@ -117,20 +121,19 @@ export function generateMockCVData(baseData?: Partial<CVData>): CVData {
     startDate: randomDate(2018, 2023),
     endDate: randomInt(0, 1) === 0 ? randomDate(2022, currentYear) : '',
     currentlyWorking: randomInt(0, 1) === 1,
-    description: `Responsible for developing and maintaining web applications. Collaborated with team members to deliver projects on time.
-      Improved code quality and implemented best practices. Participated in code reviews and mentored junior developers.`
+    description: `Responsabile dello sviluppo e della manutenzione di applicazioni web. Ho collaborato con i team member per consegnare progetti in tempo. Ho migliorato la qualità del codice e implementato le best practices. Ho partecipato a code review e mentorizzato sviluppatori junior.`
   }));
 
   const education = Array.from({ length: randomInt(2, 3) }, () => ({
     id: Math.random().toString(),
     institution: randomElement(universities),
     degree: randomElement(degrees),
-    field: 'Computer Science',
+    field: 'Informatica e Tecnologie',
     startDate: randomDate(2010, 2018),
     endDate: randomDate(2013, 2021),
     currentlyStudying: false,
     grade: `${randomInt(85, 110)}/110`,
-    description: 'Thesis on modern web development practices'
+    description: 'Tesi su moderne pratiche di sviluppo web e architetture scalabili'
   }));
 
   const selectedSkills = skills
@@ -165,8 +168,7 @@ export function generateMockCVData(baseData?: Partial<CVData>): CVData {
       linkedin: `https://linkedin.com/in/${firstName.toLowerCase()}-${lastName.toLowerCase()}`,
       github: `https://github.com/${firstName.toLowerCase()}`
     },
-    professionalSummary: `Passionate ${randomElement(positions)} with ${randomInt(3, 10)} years of experience in building scalable and reliable applications.
-      Strong problem solver with excellent communication skills. Always eager to learn new technologies and best practices.`,
+    professionalSummary: `${randomElement(positions)} appassionato con ${randomInt(3, 10)} anni di esperienza nella realizzazione di applicazioni scalabili e affidabili. Forte capacità di risoluzione dei problemi con eccellenti competenze di comunicazione. Sempre desideroso di imparare nuove tecnologie e seguire le best practices del settore.`,
     experiences,
     education,
     skills: selectedSkills.map(skill => ({
@@ -188,7 +190,7 @@ export function generateMockCVData(baseData?: Partial<CVData>): CVData {
         issuingDate: randomDate(2010, 2020),
         expiryDate: randomDate(currentYear + 1, currentYear + 5)
       }] : [],
-      hobbies: ['Reading', 'Coding', 'Sports', 'Photography', 'Traveling']
+      hobbies: ['Lettura', 'Programmazione', 'Sport', 'Fotografia', 'Viaggi', 'Musica', 'Gaming', 'Cucina']
         .sort(() => Math.random() - 0.5)
         .slice(0, randomInt(2, 4))
     }
