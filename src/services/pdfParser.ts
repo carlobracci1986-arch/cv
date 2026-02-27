@@ -33,7 +33,7 @@ export async function extractTextFromPDF(file: File): Promise<string> {
 export function parseCVText(text: string): Partial<CVData> {
   const cvData = { ...defaultCVData };
 
-  // Normalize text
+  // Normalize text - but keep original for patterns
   const normalizedText = text.toLowerCase();
 
   // Extract email
@@ -42,70 +42,75 @@ export function parseCVText(text: string): Partial<CVData> {
     cvData.personalInfo.email = emailMatch[0];
   }
 
-  // Extract phone
-  const phoneMatch = text.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/);
+  // Extract phone (multiple formats)
+  const phoneMatch = text.match(/(\+\d{1,3}[\s.-]?)?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,4}[\s.-]?\d{1,4}/);
   if (phoneMatch) {
-    cvData.personalInfo.phone = phoneMatch[0];
+    cvData.personalInfo.phone = phoneMatch[0].trim();
   }
 
-  // Extract name (usually first line with capital letters)
-  const nameMatch = text.match(/^([A-Z][a-z]+ [A-Z][a-z]+)/m);
-  if (nameMatch) {
-    const [first, last] = nameMatch[1].split(' ');
-    cvData.personalInfo.firstName = first;
-    cvData.personalInfo.lastName = last;
+  // Extract name (first 1-2 lines with capital letters, before email/phone)
+  const nameLines = text.split('\n').slice(0, 5);
+  for (const line of nameLines) {
+    if (line.match(/^[A-Z][a-z]+ [A-Z][a-z]+/) && !line.includes('@')) {
+      const parts = line.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        cvData.personalInfo.firstName = parts[0];
+        cvData.personalInfo.lastName = parts[1];
+        break;
+      }
+    }
   }
 
-  // Extract job title (look for common patterns)
-  const jobTitleKeywords = ['developer', 'engineer', 'designer', 'manager', 'consultant', 'analyst', 'architect', 'specialist'];
+  // Extract job title (look for common patterns - Italian + English)
+  const jobTitleKeywords = ['developer', 'engineer', 'designer', 'manager', 'consultant', 'analyst', 'architect', 'specialist',
+                             'sviluppatore', 'ingegnere', 'progettista', 'responsabile', 'consulente', 'analista', 'esperto', 'coordinatore'];
   const jobTitleMatch = text.match(new RegExp(jobTitleKeywords.join('|'), 'i'));
   if (jobTitleMatch) {
-    // Try to get the full job title line
     const lines = text.split('\n');
     for (const line of lines) {
-      if (line.toLowerCase().includes(jobTitleMatch[0].toLowerCase())) {
+      if (line.toLowerCase().includes(jobTitleMatch[0].toLowerCase()) && line.length < 150) {
         cvData.personalInfo.jobTitle = line.trim().substring(0, 100);
         break;
       }
     }
   }
 
-  // Extract professional summary (look for summary/objective section)
-  const summaryMatch = text.match(/(professional summary|summary|objective|profile)[:\s]*([^\n]{20,200})/i);
+  // Extract professional summary (Italian + English)
+  const summaryMatch = text.match(/(professional summary|summary|objective|profile|sintesi|riepilogo|profilo|presentazione)[:\s]*([^\n]{20,200})/i);
   if (summaryMatch) {
     cvData.professionalSummary = summaryMatch[2].trim().substring(0, 500);
   }
 
-  // Parse experiences
-  const expSection = text.match(/(experience|work experience|employment)[:\s]*(.+?)(?=education|skills|certifications|languages|$)/is);
+  // Parse experiences (Italian + English)
+  const expSection = text.match(/(experience|work experience|employment|esperienze?|esperienze? lavorativ|occupazione|lavori?)[:\s]*(.+?)(?=educazione|education|competenz|skills|certificazioni?|certifications?|lingue|languages|contatti?|$)/is);
   if (expSection) {
     const experiences = parseExperienceSection(expSection[2]);
     cvData.experiences = experiences;
   }
 
-  // Parse education
-  const eduSection = text.match(/(education|academic|formation|qualifications)[:\s]*(.+?)(?=skills|certifications|languages|experience|$)/is);
+  // Parse education (Italian + English)
+  const eduSection = text.match(/(education|academic|formation|qualifications|educazione|formazione|istruzione|studi|titoli?|laurea)[:\s]*(.+?)(?=competenz|skills|certificazioni?|certifications?|lingue|languages|esperienze?|experience|$)/is);
   if (eduSection) {
     const education = parseEducationSection(eduSection[2]);
     cvData.education = education;
   }
 
-  // Parse skills
-  const skillsSection = text.match(/(skills|competencies|technical skills)[:\s]*(.+?)(?=certifications|languages|experience|education|$)/is);
+  // Parse skills (Italian + English)
+  const skillsSection = text.match(/(skills|competencies|technical skills|competenze?|abilità|capacità)[:\s]*(.+?)(?=certificazioni?|certifications?|lingue|languages|esperienze?|experience|educazione|education|$)/is);
   if (skillsSection) {
     const skills = parseSkillsSection(skillsSection[2]);
     cvData.skills = skills;
   }
 
-  // Parse languages
-  const langSection = text.match(/(languages?|language proficiency)[:\s]*(.+?)(?=skills|certifications|experience|education|$)/is);
+  // Parse languages (Italian + English)
+  const langSection = text.match(/(languages?|language proficiency|lingue|lingue professionali|conoscenza lingue)[:\s]*(.+?)(?=competenze?|skills|certificazioni?|certifications?|esperienze?|experience|educazione|education|$)/is);
   if (langSection) {
     const languages = parseLanguageSection(langSection[2]);
     cvData.languages = languages;
   }
 
-  // Parse certifications
-  const certSection = text.match(/(certifications?|certificates)[:\s]*(.+?)(?=languages|skills|experience|education|$)/is);
+  // Parse certifications (Italian + English)
+  const certSection = text.match(/(certifications?|certificates|certificazioni?|certificati?|patenti?)[:\s]*(.+?)(?=lingue|languages|competenze?|skills|esperienze?|experience|educazione|education|$)/is);
   if (certSection) {
     const certs = parseCertificationSection(certSection[2]);
     cvData.other.certifications = certs;
@@ -118,7 +123,6 @@ export function parseCVText(text: string): Partial<CVData> {
  * Parse experience section
  */
 function parseExperienceSection(text: string) {
-  const { Experience } = require('../types/cv.types');
   const experiences = [];
 
   // Split by common delimiters (newlines with capital letters or dates)
@@ -138,21 +142,21 @@ function parseExperienceSection(text: string) {
       description: ''
     };
 
-    const lines = entry.split('\n');
+    const lines = entry.split('\n').filter(l => l.trim());
 
-    // Try to extract company and position
+    // Try to extract company and position from first lines
     if (lines[0]) {
-      const parts = lines[0].split(/[-–•]/);
+      const parts = lines[0].split(/[-–•,]/);
       exp.position = parts[0].trim();
       exp.company = parts[1]?.trim() || '';
     }
 
-    // Extract dates
-    const dateMatch = entry.match(/(\d{4}|\d{1,2}\/\d{1,2})\s*[-–]\s*(\d{4}|present|current|ongoing|now)?/i);
+    // Extract dates (supports various formats: 2020, 01/2020, January 2020, etc.)
+    const dateMatch = entry.match(/(\d{4}|\d{1,2}\/\d{4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+\d{4})\s*[-–to]?\s*(\d{4}|\d{1,2}\/\d{4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\s+\d{4}|present|current|ongoing|now|ad oggi|oggi|tuttora)?/i);
     if (dateMatch) {
       exp.startDate = dateMatch[1];
       exp.endDate = dateMatch[2] || '';
-      if (dateMatch[2]?.toLowerCase().match(/present|current|ongoing|now/)) {
+      if (dateMatch[2]?.toLowerCase().match(/present|current|ongoing|now|ad oggi|oggi|tuttora/)) {
         exp.currentlyWorking = true;
       }
     }
@@ -189,7 +193,7 @@ function parseEducationSection(text: string) {
       description: ''
     };
 
-    const lines = entry.split('\n');
+    const lines = entry.split('\n').filter(l => l.trim());
 
     // First line usually has degree and/or institution
     if (lines[0]) {
@@ -198,8 +202,8 @@ function parseEducationSection(text: string) {
       edu.institution = parts[1]?.trim() || '';
     }
 
-    // Look for field/specialization
-    const fieldMatch = entry.match(/(?:in|specialization|major)[\s:]*([^,\n]+)/i);
+    // Look for field/specialization (Italian + English)
+    const fieldMatch = entry.match(/(?:in|specialization|major|in|campo|indirizzo|specializzazione|corso)[\s:]*([^,\n]+)/i);
     if (fieldMatch) {
       edu.field = fieldMatch[1].trim();
     }
@@ -209,6 +213,12 @@ function parseEducationSection(text: string) {
     if (dateMatch) {
       edu.startDate = dateMatch[1];
       edu.endDate = dateMatch[2] || '';
+    }
+
+    // Look for grade/voto
+    const gradeMatch = entry.match(/(?:grade|voto|media)[\s:]*([^\n]+)/i);
+    if (gradeMatch) {
+      edu.grade = gradeMatch[1].trim().substring(0, 50);
     }
 
     if (edu.degree || edu.institution) {
@@ -231,12 +241,24 @@ function parseSkillsSection(text: string) {
     .map(s => s.trim())
     .filter(s => s.length > 1 && s.length < 100);
 
-  for (const skill of skillList.slice(0, 20)) {
+  // Categorize skills based on keywords
+  const technicalKeywords = ['python', 'javascript', 'java', 'react', 'node', 'sql', 'html', 'css', 'typescript', 'api', 'rest', 'database', 'linux', 'windows', 'docker', 'kubernetes', 'git', 'nodejs', 'expressjs', 'mongodb', 'postgresql', 'mysql'];
+  const softKeywords = ['management', 'leadership', 'communication', 'teamwork', 'problem-solving', 'project', 'gestione', 'comunicazione', 'leadership', 'lavoro di gruppo'];
+
+  for (const skill of skillList.slice(0, 30)) {
+    // Determine category
+    let category = 'other';
+    if (technicalKeywords.some(kw => skill.toLowerCase().includes(kw))) {
+      category = 'technical';
+    } else if (softKeywords.some(kw => skill.toLowerCase().includes(kw))) {
+      category = 'soft';
+    }
+
     skills.push({
       id: Math.random().toString(),
       name: skill,
       level: 3 as const,
-      category: 'technical' as const
+      category: category as any
     });
   }
 
@@ -257,18 +279,18 @@ function parseLanguageSection(text: string) {
     let name = cleaned;
     let level: any = 'B1';
 
-    // Try to extract level
-    if (cleaned.match(/fluent|native|c2/i)) level = 'C2';
-    else if (cleaned.match(/professional|c1|advanced/i)) level = 'C1';
-    else if (cleaned.match(/upper\s*intermediate|b2/i)) level = 'B2';
-    else if (cleaned.match(/intermediate|b1/i)) level = 'B1';
-    else if (cleaned.match(/elementary|a2/i)) level = 'A2';
-    else if (cleaned.match(/beginner|a1/i)) level = 'A1';
+    // Try to extract level (Italian + English)
+    if (cleaned.match(/fluent|native|c2|madrelingua|bilingue|perfetto|corretto/i)) level = 'C2';
+    else if (cleaned.match(/professional|c1|advanced|avanzato|professionale|superiore/i)) level = 'C1';
+    else if (cleaned.match(/upper\s*intermediate|b2|intermedio\s*superiore/i)) level = 'B2';
+    else if (cleaned.match(/intermediate|b1|intermedio|buono/i)) level = 'B1';
+    else if (cleaned.match(/elementary|a2|elementare/i)) level = 'A2';
+    else if (cleaned.match(/beginner|a1|principiante/i)) level = 'A1';
 
-    // Remove level from name
-    name = name.replace(/[-–]\s*(fluent|native|c2|c1|b2|b1|a2|a1|beginner|elementary|intermediate|professional|advanced)/i, '').trim();
+    // Remove level from name (Italian + English)
+    name = name.replace(/[-–]\s*(fluent|native|c2|c1|b2|b1|a2|a1|beginner|elementary|intermediate|professional|advanced|madrelingua|bilingue|perfetto|corretto|avanzato|professionale|superiore|intermedio|buono|elementare|principiante)/i, '').trim();
 
-    if (name) {
+    if (name && name.length > 1) {
       languages.push({
         id: Math.random().toString(),
         name,
