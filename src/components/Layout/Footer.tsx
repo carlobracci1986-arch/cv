@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield } from 'lucide-react';
+import { BUILD_VERSION } from '../../version';
 
 const LINKS = [
   { label: 'Privacy Policy', to: '/privacy-policy' },
@@ -17,6 +18,7 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <Shield className="w-4 h-4 text-green-500 flex-shrink-0" />
             <span>© 2024 CV Builder AI - GDPR Compliant</span>
+            <span className="text-xs text-gray-400 font-mono">({BUILD_VERSION})</span>
           </div>
 
           {/* Links */}
