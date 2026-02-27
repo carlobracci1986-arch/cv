@@ -21,6 +21,7 @@ import { ProfessionalSummary } from '../components/FormSections/ProfessionalSumm
 
 import { CVPreview } from '../components/CVPreview';
 import { CVCustomizer } from '../components/CVCustomizer';
+import { CVImportExport } from '../components/CVImportExport/CVImportExport';
 import { VersionList } from '../components/VersionManager/VersionList';
 import { PrivacySettings } from '../components/Privacy/PrivacySettings';
 import { AIConsentDialog } from '../components/Privacy/AIConsentDialog';
@@ -246,6 +247,13 @@ export const Editor: React.FC = () => {
         <div className="flex items-center gap-3">
           <span className="hidden sm:block text-xs text-gray-400">{lastSavedText}</span>
           <div className={`w-2 h-2 rounded-full ${isDirty ? 'bg-yellow-400' : 'bg-green-400'}`} title={isDirty ? 'Modifiche non salvate' : 'Salvato'} />
+
+          {/* Import/Export CV */}
+          <CVImportExport
+            cvData={cvData}
+            onImport={(importedData) => updateCVData(importedData)}
+          />
+
           <button
             onClick={handleDownloadPDF}
             disabled={isPdfLoading}
