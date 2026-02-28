@@ -219,48 +219,66 @@ OUTPUT: Respond ONLY with valid JSON with the same structure as the input, but w
 };
 
 export const generateInterviewPrep = async (cvData: CVData, jobDescription: string): Promise<InterviewPrepResult> => {
-  const prompt = `Sei un esperto recruiter e career coach italiano. Analizza questo CV e la job description e genera una preparazione completa per il colloquio.
+  // Only send relevant CV fields to reduce prompt size
+  const cvSummary = {
+    nome: `${cvData.personalInfo.firstName} ${cvData.personalInfo.lastName}`,
+    titolo: cvData.personalInfo.jobTitle,
+    profilo: cvData.professionalSummary?.substring(0, 300),
+    esperienze: cvData.experiences.map(e => ({
+      ruolo: e.position, azienda: e.company,
+      periodo: `${e.startDate} - ${e.endDate || 'presente'}`,
+      descrizione: e.description?.substring(0, 150),
+    })),
+    formazione: cvData.education.map(e => ({ titolo: e.degree, campo: e.field, istituto: e.institution })),
+    competenze: cvData.skills.map(s => s.name).slice(0, 15),
+  };
 
-JOB DESCRIPTION:
-${jobDescription}
+  const prompt = `Sei un esperto recruiter italiano. Genera domande di colloquio basate su questo CV e job description.
 
-CV:
-${JSON.stringify(cvData, null, 2)}
+JOB DESCRIPTION (prime 800 parole):
+${jobDescription.substring(0, 800)}
 
-Genera:
-1. 15-20 domande probabili con risposte suggerite usando metodo STAR
-2. Analisi dei punti deboli del CV
-3. Consigli generali per il colloquio
+CV RIASSUNTO:
+${JSON.stringify(cvSummary, null, 1)}
 
-OUTPUT: Rispondi SOLO con JSON valido:
+Genera ESATTAMENTE 8 domande con risposte brevi (max 80 parole ciascuna) e 2-3 punti deboli.
+
+OUTPUT: Rispondi SOLO con questo JSON minimo e compatto:
 {
   "questions": [
     {
       "id": "q1",
-      "question": "Parlami di te",
+      "question": "Domanda breve?",
       "type": "motivational",
       "difficulty": "low",
       "probability": "high",
-      "suggestedAnswer": "Risposta strutturata STAR...",
-      "tips": ["Consiglio 1", "Consiglio 2"],
-      "keyPoints": ["Punto chiave 1"]
+      "suggestedAnswer": "Risposta breve max 80 parole.",
+      "tips": ["Consiglio 1"],
+      "keyPoints": ["Punto chiave"]
     }
   ],
   "weaknesses": [
     {
       "type": "gap",
-      "description": "Gap di 6 mesi nel 2022",
-      "suggestions": ["Puoi spiegare dicendo...", "Enfatizza cosa hai fatto nel periodo"]
+      "description": "Breve descrizione.",
+      "suggestions": ["Suggerimento breve"]
     }
   ],
-  "overallTips": ["Arriva 10 minuti prima", "Porta copia del CV stampata"]
+  "overallTips": ["Consiglio 1", "Consiglio 2", "Consiglio 3"]
 }
 
-I type validi per questions sono: "behavioral", "technical", "motivational", "situational", "weakness"
-I type validi per weaknesses sono: "gap", "frequent_change", "missing_skill", "inactivity"
-difficulty e probability: "low", "medium", "high"`;
+REGOLE STRICT:
+- ESATTAMENTE 8 domande, non di più
+- suggestedAnswer MAX 80 parole
+- tips: solo 1 elemento per domanda
+- keyPoints: solo 1 elemento per domanda
+- suggestions per weakness: solo 1 elemento
+- overallTips: esattamente 3 elementi
+- type validi: "behavioral","technical","motivational","situational","weakness"
+- type weaknesses: "gap","frequent_change","missing_skill","inactivity"
+- difficulty/probability: "low","medium","high"`;
 
-  const text = await callClaude(prompt, 5000);
+  const text = await callClaude(prompt, 4000);
   return parseJSON<InterviewPrepResult>(text);
 };
 
