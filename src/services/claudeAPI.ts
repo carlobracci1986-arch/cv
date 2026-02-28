@@ -37,44 +37,44 @@ const callClaude = async (prompt: string, maxTokens = 4096): Promise<string> => 
 };
 
 const parseJSON = <T>(text: string): T => {
-  // Extract JSON from potential markdown code blocks
-  const markdownMatch = text.match(/```json\n?([\s\S]*?)\n?```/);
-  let jsonStr = markdownMatch ? markdownMatch[1] : text;
+  // Extract JSON from markdown code blocks if present
+  const markdownMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  let jsonStr = markdownMatch ? markdownMatch[1].trim() : text.trim();
 
-  // If no markdown match, try direct JSON match
+  // If no markdown, find the outermost JSON object
   if (!markdownMatch) {
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      throw new Error('Impossibile estrarre JSON dalla risposta');
-    }
-    jsonStr = jsonMatch[0];
+    const start = jsonStr.indexOf('{');
+    const end = jsonStr.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('Impossibile estrarre JSON dalla risposta');
+    jsonStr = jsonStr.substring(start, end + 1);
   }
 
-  // Clean up the JSON string carefully
-  jsonStr = jsonStr
-    .replace(/\r/g, '')                         // Remove carriage returns
-    .replace(/\n/g, ' ')                        // Replace all newlines with spaces first
-    .replace(/\s+/g, ' ')                       // Collapse multiple spaces
-    .replace(/:\s*"([^"]*)"/g, (match, p1) => {  // Fix all quoted strings
-      // Replace any remaining escape issues in quoted strings
-      const clean = p1
-        .replace(/\\+n/g, ' ')                  // Remove any escaped newlines
-        .replace(/\\+t/g, ' ')                  // Remove any escaped tabs
-        .replace(/\\/g, '\\\\')                 // Escape backslashes
-        .replace(/"/g, '\\"')                   // Escape unescaped quotes
-        .trim();
-      return `: "${clean}"`;
-    })
-    .replace(/,\s*}/g, '}')                     // Remove trailing commas before }
-    .replace(/,\s*\]/g, ']')                    // Remove trailing commas before ]
-    .replace(/:\s*\[\s*\]/g, ': []')            // Fix empty arrays
-    .replace(/:\s*\{\s*\}/g, ': {}');           // Fix empty objects
+  // Attempt 1: parse as-is
+  try { return JSON.parse(jsonStr); } catch (_) {}
 
-  try {
-    return JSON.parse(jsonStr);
-  } catch (error) {
-    console.error('Parsing JSON fallito dopo pulizia:', error);
-    console.error('Tentato di parsare:', jsonStr.substring(0, 300));
+  // Attempt 2: minimal safe fixes only (trailing commas, no string mutation)
+  const minimal = jsonStr
+    .replace(/,\s*([}\]])/g, '$1')   // trailing commas
+    .replace(/\r/g, '');             // carriage returns
+  try { return JSON.parse(minimal); } catch (_) {}
+
+  // Attempt 3: fix unescaped newlines/tabs ONLY inside string values
+  // Walk char-by-char to safely escape literal newlines inside strings
+  let fixed = '';
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < minimal.length; i++) {
+    const ch = minimal[i];
+    if (escaped) { fixed += ch; escaped = false; continue; }
+    if (ch === '\\') { escaped = true; fixed += ch; continue; }
+    if (ch === '"') { inString = !inString; fixed += ch; continue; }
+    if (inString && ch === '\n') { fixed += '\\n'; continue; }
+    if (inString && ch === '\t') { fixed += '\\t'; continue; }
+    fixed += ch;
+  }
+  try { return JSON.parse(fixed); } catch (error) {
+    console.error('Parsing JSON fallito dopo tutti i tentativi:', (error as Error).message);
+    console.error('Primi 400 char:', fixed.substring(0, 400));
     throw error;
   }
 };
@@ -272,14 +272,16 @@ OUTPUT: Rispondi SOLO con questo JSON minimo e compatto:
 
 REGOLE STRICT:
 - ESATTAMENTE 8 domande, non di più
-- suggestedAnswer MAX 80 parole
-- tips: solo 1 elemento per domanda
-- keyPoints: solo 1 elemento per domanda
-- suggestions per weakness: solo 1 elemento
-- overallTips: esattamente 3 elementi
+- suggestedAnswer MAX 60 parole, nessun a capo
+- tips: solo 1 elemento per domanda, max 10 parole
+- keyPoints: solo 1 elemento per domanda, max 5 parole
+- suggestions per weakness: solo 1 elemento, max 15 parole
+- overallTips: esattamente 3 elementi, max 10 parole ciascuno
 - type validi: "behavioral","technical","motivational","situational","weakness"
 - type weaknesses: "gap","frequent_change","missing_skill","inactivity"
-- difficulty/probability: "low","medium","high"`;
+- difficulty/probability: "low","medium","high"
+- NON usare virgolette nei testi delle stringhe
+- NON usare apostrofi nei testi (usa forma senza apostrofo)`;
 
   const text = await callClaude(prompt, 5000);
   return parseJSON<InterviewPrepResult>(text);
