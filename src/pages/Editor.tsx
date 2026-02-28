@@ -481,7 +481,7 @@ export const Editor: React.FC = () => {
                 {([
                   { id: 'optimizer', label: '✨ Ottimizza' },
                   { id: 'ats', label: '📊 ATS Score' },
-                  { id: 'cover-letter', label: '📝 Cover Letter' },
+                  { id: 'cover-letter', label: '📝 Lettera di Presentazione' },
                   { id: 'interview', label: '🎤 Colloquio' },
                 ] as { id: AITab; label: string }[]).map(tab => (
                   <button
