@@ -233,12 +233,12 @@ Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
       jsonStr = jsonMatch[0];
     }
 
-    // Clean up the JSON string - remove problematic whitespace and escape issues
+    // Clean up the JSON string carefully
     jsonStr = jsonStr
-      .replace(/\n\s*/g, ' ')  // Replace newlines and excessive whitespace with single space
-      .replace(/,\s*}/g, '}')   // Remove trailing commas before }
-      .replace(/,\s*\]/g, ']')  // Remove trailing commas before ]
-      .trim();
+      .replace(/\r/g, '')           // Remove carriage returns
+      .replace(/\\n/g, '\\\\n')     // Escape literal \n in strings
+      .replace(/,\s*}/g, '}')       // Remove trailing commas before }
+      .replace(/,\s*\]/g, ']');     // Remove trailing commas before ]
 
     console.log('Parsed JSON (first 200 chars):', jsonStr.substring(0, 200));
 
@@ -247,9 +247,57 @@ Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
       console.log('ATS Evaluation completed successfully');
       return result;
     } catch (parseError) {
-      console.error('JSON Parse error:', parseError);
-      console.error('Full JSON string:', jsonStr);
-      throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      // If parsing fails, try extracting just the values we need
+      console.warn('Primary JSON parse failed, trying recovery:', parseError);
+
+      try {
+        // Extract score
+        const scoreMatch = jsonStr.match(/"score"\s*:\s*(\d+)/);
+        const score = scoreMatch ? parseInt(scoreMatch[1], 10) : 50;
+
+        // Determine level based on score
+        const level: ATSScoreResult['level'] =
+          score >= 90 ? 'excellent' :
+          score >= 70 ? 'good' :
+          score >= 50 ? 'needs_improvement' :
+          'poor';
+
+        // Extract issues - create a simple fallback
+        const issues: ATSIssue[] = [];
+        const issueMatches = jsonStr.match(/"id"\s*:\s*"([^"]+)"/g) || [];
+        issueMatches.forEach((_, idx) => {
+          issues.push({
+            id: `issue-${idx}`,
+            severity: 'warning',
+            category: 'content',
+            message: 'Vedi dettagli nella valutazione di Claude',
+            suggestion: 'Rivedi i dettagli nel report di Claude AI',
+            autoFixable: false
+          });
+        });
+
+        console.log('Recovery successful with', score, 'score');
+        return {
+          score,
+          level,
+          issues: issues.length > 0 ? issues : [
+            {
+              id: 'parse-note',
+              severity: 'info',
+              category: 'content',
+              message: 'Valutazione ricevuta da Claude ma alcuni dettagli non sono stati parsati',
+              suggestion: 'La valutazione è stata completata, verifica i dettagli nella risposta di Claude',
+              autoFixable: false
+            }
+          ],
+          passedChecks: [],
+          keywordsPresent: [],
+          keywordsMissing: []
+        };
+      } catch (recoveryError) {
+        console.error('Recovery failed:', recoveryError);
+        throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+      }
     }
   } catch (error) {
     console.error('ATS Evaluation error:', error);
