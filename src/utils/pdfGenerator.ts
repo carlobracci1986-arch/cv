@@ -23,11 +23,20 @@ export const generatePDFFromElement = async (
     watermark,
   } = options;
 
-  const scale = quality === 'high' ? 4 : 2.5;
+  // On mobile use lower scale to avoid OOM (A4 at scale 4 = ~25M pixels)
+  const isMobile = window.innerWidth < 768;
+  const scale = isMobile ? 2 : (quality === 'high' ? 4 : 2.5);
+
+  // A4 width in px at 96dpi — used as fallback when element is display:none
+  const A4_WIDTH_PX = 794;
 
   // On mobile the preview panel may be display:none (hidden md:flex).
-  // Clone the element into an off-screen wrapper so html2canvas can render it
-  // regardless of the parent's visibility state.
+  // scrollWidth is 0 when hidden, so use A4_WIDTH_PX as fallback.
+  const sourceWidth = element.scrollWidth > 0 ? element.scrollWidth : A4_WIDTH_PX;
+  const sourceHeight = element.scrollHeight > 0 ? element.scrollHeight : Math.round(A4_WIDTH_PX * 1.414);
+
+  // Clone into off-screen wrapper so html2canvas can render it
+  // regardless of the parent visibility state.
   const wrapper = document.createElement('div');
   wrapper.style.cssText = [
     'position:fixed',
@@ -35,11 +44,17 @@ export const generatePDFFromElement = async (
     'top:0',
     'z-index:-1',
     'pointer-events:none',
-    `width:${element.scrollWidth}px`,
+    `width:${sourceWidth}px`,
     'background:#ffffff',
+    'overflow:visible',
   ].join(';');
   const clone = element.cloneNode(true) as HTMLElement;
-  clone.style.cssText = 'display:block !important; visibility:visible !important;';
+  clone.style.cssText = [
+    'display:block',
+    'visibility:visible',
+    `width:${sourceWidth}px`,
+    'min-height:1px',
+  ].join(';');
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
 
@@ -51,8 +66,8 @@ export const generatePDFFromElement = async (
       allowTaint: true,
       backgroundColor: '#ffffff',
       logging: false,
-      windowWidth: element.scrollWidth,
-      windowHeight: element.scrollHeight,
+      windowWidth: sourceWidth,
+      windowHeight: sourceHeight,
       imageTimeout: 0,
     });
   } finally {
