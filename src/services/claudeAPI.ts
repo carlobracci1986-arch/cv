@@ -1,4 +1,29 @@
 /// <reference types="vite/client" />
+/**
+ * claudeAPI.ts — Servizio AI con Claude (Anthropic)
+ *
+ * STORICO VERSIONI (per ripristino futuro):
+ * ──────────────────────────────────────────
+ * v1 (commit ~207d035): Prima implementazione con fetch diretta.
+ *   - optimizeCV: restituiva intero JSON del CV ottimizzato (max_tokens 6000)
+ *   - parseJSON: regex semplice /```json...```/ + JSON.parse diretto
+ *   → PROBLEMA: JSON troncato per CV grandi → errore parse
+ *
+ * v2 (commit ~b3f195a): Cleanup regex aggressivo nel parseJSON
+ *   - Aggiunto cleanup: replace \r, \n, trailing commas, quoted strings
+ *   → PROBLEMA: il regex /:s*"([^"]*)"/g corrompeva stringhe con escape interni
+ *
+ * v3 (commit ~3697408): Parser char-by-char (versione corrente stabile)
+ *   - parseJSON: 3 tentativi progressivi (as-is → minimal fixes → char-by-char)
+ *   - optimizeCV: restituisce SOLO le changes (non intero CV), applica lato client
+ *   - generateInterviewPrep: max 8 domande, CV compatto, job desc 5000 chars
+ *   - generateCoverLetter: aggiunta opzione length (brief/full)
+ *   → STABILE: usa questo approccio come baseline per future modifiche
+ *
+ * NOTA: Se si vuole tornare a optimizeCV che restituisce l'intero CV,
+ *   aumentare max_tokens a 8000 e ridurre il CV input al minimo necessario.
+ *   Attenzione: Claude ha limite output ~8096 token per risposta.
+ */
 import { CVData } from '../types/cv.types';
 import { OptimizationResult, CoverLetterOptions, InterviewPrepResult } from '../types/ai.types';
 import { sanitizeDataForAPI } from '../utils/gdprConsent';

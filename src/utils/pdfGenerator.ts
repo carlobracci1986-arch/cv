@@ -25,16 +25,39 @@ export const generatePDFFromElement = async (
 
   const scale = quality === 'high' ? 4 : 2.5;
 
-  const canvas = await html2canvas(element, {
-    scale,
-    useCORS: true,
-    allowTaint: true,
-    backgroundColor: '#ffffff',
-    logging: false,
-    windowWidth: element.scrollWidth,
-    windowHeight: element.scrollHeight,
-    imageTimeout: 0,
-  });
+  // On mobile the preview panel may be display:none (hidden md:flex).
+  // Clone the element into an off-screen wrapper so html2canvas can render it
+  // regardless of the parent's visibility state.
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = [
+    'position:fixed',
+    'left:-9999px',
+    'top:0',
+    'z-index:-1',
+    'pointer-events:none',
+    `width:${element.scrollWidth}px`,
+    'background:#ffffff',
+  ].join(';');
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.style.cssText = 'display:block !important; visibility:visible !important;';
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  let canvas: HTMLCanvasElement;
+  try {
+    canvas = await html2canvas(clone, {
+      scale,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      windowWidth: element.scrollWidth,
+      windowHeight: element.scrollHeight,
+      imageTimeout: 0,
+    });
+  } finally {
+    document.body.removeChild(wrapper);
+  }
 
   const imgData = canvas.toDataURL('image/png');
   const pdf = new jsPDF({

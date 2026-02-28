@@ -1,4 +1,25 @@
 /// <reference types="vite/client" />
+/**
+ * atsScoring.ts — Valutazione ATS del CV
+ *
+ * STORICO VERSIONI (per ripristino futuro):
+ * ──────────────────────────────────────────
+ * v1 (commit ~207d035): calculateATSScore() — algoritmo locale rule-based
+ *   - Valutazione basata su regole fisse (email, telefono, esperienze, ecc.)
+ *   - Nessuna chiamata API, risultato istantaneo
+ *   → Se si vuole tornare all'algoritmo locale, usare calculateATSScore()
+ *     che è ancora presente nel file e funzionante.
+ *
+ * v2 (commit ~ff5adf1): evaluateATSWithClaude() — valutazione AI (versione corrente)
+ *   - Chiama Claude API con il testo del CV formattato
+ *   - Restituisce score, issues, passedChecks, keywords presenti/mancanti
+ *   - Fallback recovery: estrae lo score anche se il JSON è parzialmente malformato
+ *   - Il parsing JSON ora usa il parseJSON centralizzato (char-by-char)
+ *   → STABILE: usa evaluateATSWithClaude come funzione principale
+ *
+ * NOTA: Per richiamare l'algoritmo locale senza API, basta importare
+ *   calculateATSScore invece di evaluateATSWithClaude in Editor.tsx
+ */
 import { CVData, CVSettings } from '../types/cv.types';
 import { ATSScoreResult, ATSIssue } from '../types/ai.types';
 
