@@ -80,57 +80,65 @@ const parseJSON = <T>(text: string): T => {
 };
 
 export const optimizeCV = async (cvData: CVData, jobDescription: string): Promise<OptimizationResult> => {
-  // Sanitize sensitive data before sending to API
   const sanitizedCV = sanitizeDataForAPI(cvData);
 
-  const prompt = `Sei un esperto recruiter e career coach italiano. Analizza questo CV e ottimizzalo per la seguente offerta di lavoro.
+  // Compact CV representation to reduce prompt size
+  const cvCompact = {
+    titolo: sanitizedCV.personalInfo.jobTitle,
+    profilo: sanitizedCV.professionalSummary?.substring(0, 400),
+    esperienze: sanitizedCV.experiences.map((e: any) => ({
+      id: e.id, ruolo: e.position, azienda: e.company,
+      desc: e.description?.substring(0, 200),
+    })),
+    competenze: sanitizedCV.skills.map((s: any) => ({ id: s.id, nome: s.name })),
+  };
+
+  const prompt = `Sei un esperto recruiter italiano. Analizza questo CV e genera modifiche di ottimizzazione per la job description.
 
 JOB DESCRIPTION:
-${jobDescription}
+${jobDescription.substring(0, 2000)}
 
-CV ATTUALE (JSON):
-${JSON.stringify(sanitizedCV, null, 2)}
+CV ATTUALE:
+${JSON.stringify(cvCompact)}
 
-COMPITO:
-1. Analizza le keyword e competenze richieste nella job description
-2. Ottimizza il CV per massimizzare il match mantenendo SEMPRE la veridicità
-3. Riformula le descrizioni delle esperienze usando STAR method quando possibile
-4. Riordina le competenze mettendo in evidenza quelle più rilevanti
-5. Adatta il profilo professionale alle keywords dell'offerta
-6. Ottimizza per ATS (Applicant Tracking Systems)
+COMPITO: Genera SOLO le modifiche necessarie (NON restituire l'intero CV).
+- Riformula profilo professionale con le keyword chiave
+- Ottimizza descrizioni esperienze con metodo STAR
+- Analizza keyword match
 
-REGOLE CRITICHE:
-- NON inventare esperienze o competenze non presenti
-- NON modificare date o fatti
-- Mantieni lo stesso livello di competenza dichiarato
-- Sii onesto ma strategico nella presentazione
-- Scrivi in italiano se il CV originale è in italiano
+OUTPUT: Rispondi SOLO con JSON compatto in UNA SOLA RIGA:
+{"matchScore":85,"keywordsFound":["kw1"],"keywordsMissing":["kw2"],"changes":[{"section":"professionalSummary","field":"professionalSummary","before":"testo prima","after":"testo ottimizzato","reason":"motivo breve","accepted":true}],"suggestions":["suggerimento 1"]}
 
-OUTPUT: Rispondi SOLO con JSON valido in questo formato:
-{
-  "optimizedCV": { ...struttura CV identica all'originale ma ottimizzata... },
-  "matchScore": 85,
-  "keywordsFound": ["Python", "AWS"],
-  "keywordsMissing": ["Docker", "Kubernetes"],
-  "changes": [
-    {
-      "section": "professionalSummary",
-      "field": "professionalSummary",
-      "before": "testo originale",
-      "after": "testo ottimizzato",
-      "reason": "Aggiunto focus su X richiesto nell'offerta",
-      "accepted": true
+REGOLE:
+- MAX 5 changes totali
+- before/after max 150 caratteri ciascuno
+- reason max 60 caratteri
+- MAX 3 suggestions
+- NON restituire optimizedCV - viene costruito lato client
+- Output in UNA SOLA RIGA senza newline`;
+
+  const text = await callClaude(prompt, 3000);
+  const partial = parseJSON<Omit<OptimizationResult, 'optimizedCV'>>(text);
+
+  // Apply changes to build optimizedCV client-side
+  const optimizedCV = JSON.parse(JSON.stringify(sanitizedCV)) as typeof sanitizedCV;
+  for (const change of partial.changes ?? []) {
+    if (change.section === 'professionalSummary') {
+      (optimizedCV as any).professionalSummary = change.after;
+    } else if (change.section === 'experience') {
+      const exp = (optimizedCV as any).experiences?.find((e: any) => e.id === (change as any).itemId);
+      if (exp && change.field) (exp as any)[change.field] = change.after;
     }
-  ],
-  "suggestions": ["Considera di aggiungere certificazione Y", "Includi link GitHub"]
-}`;
+  }
 
-  const text = await callClaude(prompt, 6000);
-  const result = parseJSON<OptimizationResult>(text);
-
-  // Ensure all changes have accepted: true by default
-  result.changes = result.changes.map(c => ({ ...c, accepted: true }));
-  return result;
+  return {
+    optimizedCV: optimizedCV as any,
+    matchScore: partial.matchScore ?? 0,
+    keywordsFound: partial.keywordsFound ?? [],
+    keywordsMissing: partial.keywordsMissing ?? [],
+    changes: (partial.changes ?? []).map(c => ({ ...c, accepted: true })),
+    suggestions: partial.suggestions ?? [],
+  };
 };
 
 export const generateCoverLetter = async (
