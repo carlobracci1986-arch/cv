@@ -235,10 +235,13 @@ Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
 
     // Clean up the JSON string carefully
     jsonStr = jsonStr
-      .replace(/\r/g, '')           // Remove carriage returns
-      .replace(/\\n/g, '\\\\n')     // Escape literal \n in strings
-      .replace(/,\s*}/g, '}')       // Remove trailing commas before }
-      .replace(/,\s*\]/g, ']');     // Remove trailing commas before ]
+      .replace(/\r/g, '')                    // Remove carriage returns
+      .replace(/\n(?=[^"]*"[^"]*$)/g, ' ')   // Replace newlines not in quotes with space
+      .replace(/\\n/g, '\\\\n')              // Escape literal \n in strings
+      .replace(/,\s*}/g, '}')                // Remove trailing commas before }
+      .replace(/,\s*\]/g, ']')               // Remove trailing commas before ]
+      .replace(/:\s*"([^"]*)\n([^"]*)"/g, ': "$1 $2"')  // Fix newlines inside quoted strings
+      .replace(/"\s*:\s*"([^"]*)"\s*,/g, '": "$1",')    // Fix spacing around colons
 
     console.log('Parsed JSON (first 200 chars):', jsonStr.substring(0, 200));
 
@@ -262,19 +265,37 @@ Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
           score >= 50 ? 'needs_improvement' :
           'poor';
 
-        // Extract issues - create a simple fallback
+        // Extract issues - try to get actual messages and suggestions
         const issues: ATSIssue[] = [];
-        const issueMatches = jsonStr.match(/"id"\s*:\s*"([^"]+)"/g) || [];
-        issueMatches.forEach((_, idx) => {
+
+        // Try to extract issue objects
+        const issueRegex = /\{\s*"id"\s*:\s*"([^"]+)"[^}]*"severity"\s*:\s*"([^"]+)"[^}]*"message"\s*:\s*"([^"]+)"[^}]*"suggestion"\s*:\s*"([^"]+)"[^}]*\}/g;
+        let match;
+        let issueCount = 0;
+
+        while ((match = issueRegex.exec(jsonStr)) !== null && issueCount < 10) {
           issues.push({
-            id: `issue-${idx}`,
-            severity: 'warning',
+            id: match[1] || `issue-${issueCount}`,
+            severity: (match[2] as any) || 'warning',
             category: 'content',
-            message: 'Vedi dettagli nella valutazione di Claude',
-            suggestion: 'Rivedi i dettagli nel report di Claude AI',
+            message: match[3]?.substring(0, 200) || 'Problema rilevato',
+            suggestion: match[4]?.substring(0, 200) || 'Rivedi questo aspetto del CV',
             autoFixable: false
           });
-        });
+          issueCount++;
+        }
+
+        // If no issues found with regex, create a generic one
+        if (issues.length === 0) {
+          issues.push({
+            id: 'parse-note',
+            severity: 'info',
+            category: 'content',
+            message: 'Valutazione ricevuta da Claude AI',
+            suggestion: 'La valutazione è stata completata. Alcuni dettagli non sono stati parsati correttamente.',
+            autoFixable: false
+          });
+        }
 
         console.log('Recovery successful with', score, 'score');
         return {
