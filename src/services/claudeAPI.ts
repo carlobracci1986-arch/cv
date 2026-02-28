@@ -38,9 +38,36 @@ const callClaude = async (prompt: string, maxTokens = 4096): Promise<string> => 
 
 const parseJSON = <T>(text: string): T => {
   // Extract JSON from potential markdown code blocks
-  const jsonMatch = text.match(/```json\n?([\s\S]*?)\n?```/) || text.match(/\{[\s\S]*\}/);
-  const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : text;
-  return JSON.parse(jsonStr);
+  const markdownMatch = text.match(/```json\n?([\s\S]*?)\n?```/);
+  let jsonStr = markdownMatch ? markdownMatch[1] : text;
+
+  // If no markdown match, try direct JSON match
+  if (!markdownMatch) {
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Failed to extract JSON from response');
+    }
+    jsonStr = jsonMatch[0];
+  }
+
+  // Clean up the JSON string carefully
+  jsonStr = jsonStr
+    .replace(/\r/g, '')                    // Remove carriage returns
+    .replace(/\n(?=[^"]*"[^"]*$)/g, ' ')   // Replace newlines not in quotes with space
+    .replace(/\\n/g, '\\\\n')              // Escape literal \n in strings
+    .replace(/,\s*}/g, '}')                // Remove trailing commas before }
+    .replace(/,\s*\]/g, ']')               // Remove trailing commas before ]
+    .replace(/:\s*"([^"]*)\n([^"]*)"/g, ': "$1 $2"')  // Fix newlines inside quoted strings
+    .replace(/"\s*:\s*"([^"]*)"\s*,/g, '": "$1",')    // Fix spacing around colons
+    .replace(/([^\\])\\([nrt])/g, '$1\\\\$2');        // Fix escaped special chars
+
+  try {
+    return JSON.parse(jsonStr);
+  } catch (error) {
+    console.error('JSON parse failed after cleanup:', error);
+    console.error('Attempted to parse:', jsonStr.substring(0, 300));
+    throw error;
+  }
 };
 
 export const optimizeCV = async (cvData: CVData, jobDescription: string): Promise<OptimizationResult> => {
