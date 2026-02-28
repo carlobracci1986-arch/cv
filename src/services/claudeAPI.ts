@@ -53,12 +53,17 @@ const parseJSON = <T>(text: string): T => {
   // Clean up the JSON string carefully
   jsonStr = jsonStr
     .replace(/\r/g, '')                    // Remove carriage returns
-    .replace(/\n(?=[^"]*"[^"]*$)/g, ' ')   // Replace newlines not in quotes with space
-    .replace(/\\n/g, '\\\\n')              // Escape literal \n in strings
+    .replace(/\\n/g, '\\\\n')              // Escape literal \n in strings first
+    // Fix all newlines inside quoted strings - replace with space
+    .split('"').map((part, idx) => {
+      // Only process odd indices (content inside quotes)
+      if (idx % 2 === 1) {
+        return part.replace(/\n/g, ' ').replace(/\t/g, ' ').trim();
+      }
+      return part;
+    }).join('"')
     .replace(/,\s*}/g, '}')                // Remove trailing commas before }
     .replace(/,\s*\]/g, ']')               // Remove trailing commas before ]
-    .replace(/:\s*"([^"]*)\n([^"]*)"/g, ': "$1 $2"')  // Fix newlines inside quoted strings
-    .replace(/"\s*:\s*"([^"]*)"\s*,/g, '": "$1",')    // Fix spacing around colons
     .replace(/([^\\])\\([nrt])/g, '$1\\\\$2');        // Fix escaped special chars
 
   try {
