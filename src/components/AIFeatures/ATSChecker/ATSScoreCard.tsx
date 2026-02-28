@@ -1,5 +1,5 @@
 import React from 'react';
-import { RefreshCw, CheckCircle, AlertTriangle } from 'lucide-react';
+import { RefreshCw, CheckCircle, AlertTriangle, Info, Lightbulb } from 'lucide-react';
 import { ATSScoreResult } from '../../../types/ai.types';
 
 interface Props {
@@ -163,45 +163,139 @@ export const ATSScoreCard: React.FC<Props> = ({ result, onRefresh }) => {
       </div>
 
       {/* Stats row */}
-      <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
-        <div className="flex flex-col items-center py-4 px-3">
-          <span className="text-2xl font-bold text-green-600">{passedCount}</span>
-          <span className="text-xs text-gray-500 mt-0.5 text-center">Controlli superati</span>
-        </div>
-        <div className="flex flex-col items-center py-4 px-3">
-          <span className="text-2xl font-bold text-gray-700">{totalIssues}</span>
-          <span className="text-xs text-gray-500 mt-0.5 text-center">Problemi trovati</span>
-        </div>
-        <div className="flex flex-col items-center py-4 px-3">
-          <span
-            className={`text-2xl font-bold ${
-              criticalCount > 0 ? 'text-red-600' : 'text-gray-400'
-            }`}
-          >
-            {criticalCount}
-          </span>
-          <span className="text-xs text-gray-500 mt-0.5 text-center">Critici</span>
-        </div>
-      </div>
-
-      {/* Quick summary */}
-      <div className="px-5 py-4">
-        {criticalCount > 0 && (
-          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-red-50 border border-red-100 mb-3">
-            <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-red-700">
-              {criticalCount} problema{criticalCount > 1 ? 'i critici' : ' critico'} rilevat
-              {criticalCount > 1 ? 'i' : 'o'}. Correggili per migliorare significativamente il punteggio.
-            </p>
+      {(passedCount > 0 || totalIssues > 0) && (
+        <div className="grid grid-cols-3 divide-x divide-gray-100 border-b border-gray-100">
+          <div className="flex flex-col items-center py-4 px-3">
+            <span className="text-2xl font-bold text-green-600">{passedCount}</span>
+            <span className="text-xs text-gray-500 mt-0.5 text-center">Elementi OK</span>
           </div>
-        )}
-        {passedCount > 0 && (
+          <div className="flex flex-col items-center py-4 px-3">
+            <span className="text-2xl font-bold text-orange-600">{totalIssues}</span>
+            <span className="text-xs text-gray-500 mt-0.5 text-center">Da Migliorare</span>
+          </div>
+          <div className="flex flex-col items-center py-4 px-3">
+            <span
+              className={`text-2xl font-bold ${
+                criticalCount > 0 ? 'text-red-600' : 'text-gray-400'
+              }`}
+            >
+              {criticalCount}
+            </span>
+            <span className="text-xs text-gray-500 mt-0.5 text-center">Critici</span>
+          </div>
+        </div>
+      )}
+
+      {/* Improvements section */}
+      <div className="px-5 py-4">
+        {totalIssues > 0 ? (
+          <div>
+            <h4 className="text-sm font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Lightbulb className="w-4 h-4 text-amber-500" />
+              Miglioramenti consigliati
+            </h4>
+            <div className="space-y-2">
+              {result.issues.map((issue) => (
+                <div
+                  key={issue.id}
+                  className={`p-3 rounded-lg border text-xs ${
+                    issue.severity === 'critical'
+                      ? 'bg-red-50 border-red-200'
+                      : issue.severity === 'warning'
+                      ? 'bg-orange-50 border-orange-200'
+                      : 'bg-blue-50 border-blue-200'
+                  }`}
+                >
+                  <div className="flex items-start gap-2">
+                    {issue.severity === 'critical' && (
+                      <AlertTriangle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    {issue.severity === 'warning' && (
+                      <AlertTriangle className="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    {issue.severity === 'info' && (
+                      <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                    )}
+                    <div className="flex-1">
+                      <p
+                        className={`font-medium ${
+                          issue.severity === 'critical'
+                            ? 'text-red-900'
+                            : issue.severity === 'warning'
+                            ? 'text-orange-900'
+                            : 'text-blue-900'
+                        }`}
+                      >
+                        {issue.message}
+                      </p>
+                      {issue.suggestion && (
+                        <p
+                          className={`mt-1 ${
+                            issue.severity === 'critical'
+                              ? 'text-red-700'
+                              : issue.severity === 'warning'
+                              ? 'text-orange-700'
+                              : 'text-blue-700'
+                          }`}
+                        >
+                          💡 {issue.suggestion}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
           <div className="flex items-start gap-2.5 p-3 rounded-xl bg-green-50 border border-green-100">
             <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-green-700">
-              {passedCount} element{passedCount > 1 ? 'i' : 'o'} del CV{' '}
-              {passedCount > 1 ? 'soddisfano' : 'soddisfa'} i criteri ATS.
-            </p>
+            <div>
+              <p className="text-xs font-medium text-green-900">CV eccellente!</p>
+              <p className="text-xs text-green-700 mt-0.5">
+                Il tuo CV è perfettamente ottimizzato per i sistemi ATS.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Keywords section */}
+        {(result.keywordsPresent?.length > 0 || result.keywordsMissing?.length > 0) && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            {result.keywordsMissing && result.keywordsMissing.length > 0 && (
+              <div className="mb-3">
+                <p className="text-xs font-medium text-gray-700 mb-2">
+                  Keywords mancanti dalla job description:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {result.keywordsMissing.map((kw) => (
+                    <span
+                      key={kw}
+                      className="inline-flex px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-700"
+                    >
+                      {kw}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {result.keywordsPresent && result.keywordsPresent.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-gray-700 mb-2">
+                  Keywords presenti:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {result.keywordsPresent.map((kw) => (
+                    <span
+                      key={kw}
+                      className="inline-flex px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700"
+                    >
+                      ✓ {kw}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
