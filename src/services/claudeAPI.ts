@@ -29,7 +29,7 @@ const callClaude = async (prompt: string, maxTokens = 4096): Promise<string> => 
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
-    throw new Error(err.error?.message || `API error: ${response.status}`);
+    throw new Error(err.error?.message || `Errore API: ${response.status}`);
   }
 
   const data = await response.json();
@@ -45,7 +45,7 @@ const parseJSON = <T>(text: string): T => {
   if (!markdownMatch) {
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error('Failed to extract JSON from response');
+      throw new Error('Impossibile estrarre JSON dalla risposta');
     }
     jsonStr = jsonMatch[0];
   }
@@ -73,8 +73,8 @@ const parseJSON = <T>(text: string): T => {
   try {
     return JSON.parse(jsonStr);
   } catch (error) {
-    console.error('JSON parse failed after cleanup:', error);
-    console.error('Attempted to parse:', jsonStr.substring(0, 300));
+    console.error('Parsing JSON fallito dopo pulizia:', error);
+    console.error('Tentato di parsare:', jsonStr.substring(0, 300));
     throw error;
   }
 };

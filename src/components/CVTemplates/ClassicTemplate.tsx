@@ -167,7 +167,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
           {softSkills.length > 0 && (
             <div>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Soft Skills
+                Competenze Trasversali
               </span>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '5px' }}>
                 {softSkills.map(skill => (
@@ -291,7 +291,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
           {showPhoto && personalInfo.profilePhoto && (
             <img
               src={personalInfo.profilePhoto}
-              alt="Profile"
+              alt="Foto profilo"
               style={{ width: '80px', height: '80px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
             />
           )}

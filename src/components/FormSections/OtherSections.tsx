@@ -167,14 +167,14 @@ export const OtherSectionsForm: React.FC<Props> = ({ data, onChange }) => {
                     <label className={labelClass}>Nome Certificazione <span className="text-red-500">*</span></label>
                     <input type="text" value={cert.name}
                       onChange={e => updateCertification(cert.id, { name: e.target.value })}
-                      className={inputClass} placeholder="AWS Certified Solutions Architect" />
+                      className={inputClass} placeholder="Es. Certificazione Cloud Computing, Project Manager ISIPM" />
                   </div>
 
                   <div>
                     <label className={labelClass}>Ente Rilasciante</label>
                     <input type="text" value={cert.issuer}
                       onChange={e => updateCertification(cert.id, { issuer: e.target.value })}
-                      className={inputClass} placeholder="Amazon Web Services" />
+                      className={inputClass} placeholder="Es. Google Cloud, AICA, Agile School Italia" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">

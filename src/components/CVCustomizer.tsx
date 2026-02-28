@@ -69,9 +69,9 @@ interface FontOption_ {
 }
 
 const FONTS: FontOption_[] = [
-  { id: 'inter', label: 'Inter', sublabel: 'Modern' },
-  { id: 'georgia', label: 'Georgia', sublabel: 'Classic' },
-  { id: 'playfair', label: 'Playfair', sublabel: 'Elegant' },
+  { id: 'inter', label: 'Inter', sublabel: 'Moderno' },
+  { id: 'georgia', label: 'Georgia', sublabel: 'Classico' },
+  { id: 'playfair', label: 'Playfair', sublabel: 'Elegante' },
 ];
 
 interface SectionToggle {

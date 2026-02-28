@@ -38,7 +38,7 @@ const callGemini = async (prompt: string, maxTokens = 4096): Promise<string> => 
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
-    throw new Error(err.error?.message || `API error: ${response.status}`);
+    throw new Error(err.error?.message || `Errore API: ${response.status}`);
   }
 
   const data = await response.json();

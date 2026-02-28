@@ -128,7 +128,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         {showPhoto && personalInfo.profilePhoto && (
           <img
             src={personalInfo.profilePhoto}
-            alt="Profile"
+            alt="Foto profilo"
             style={{
               width: '90px',
               height: '90px',

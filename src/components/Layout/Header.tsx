@@ -118,7 +118,7 @@ export const Header: React.FC<Props> = ({
             <button
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
+              aria-label="Apri menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>

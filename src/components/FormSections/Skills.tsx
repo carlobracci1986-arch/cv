@@ -148,7 +148,7 @@ export const SkillsForm: React.FC<Props> = ({ skills, languages, onSkillsChange,
                     type="button"
                     onClick={() => updateSkillCategory(skill.id, 'soft')}
                     className="text-xs text-gray-400 hover:text-primary-600 transition-colors hidden group-hover:block"
-                    title="Sposta in Soft Skills"
+                    title="Sposta in Competenze Trasversali"
                   >
                     Soft
                   </button>
@@ -165,10 +165,10 @@ export const SkillsForm: React.FC<Props> = ({ skills, languages, onSkillsChange,
           </div>
         )}
 
-        {/* Soft Skills */}
+        {/* Competenze Trasversali */}
         {softSkills.length > 0 && (
           <div>
-            <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Soft Skills</p>
+            <p className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Competenze Trasversali</p>
             <div className="space-y-2">
               {softSkills.map(skill => (
                 <div key={skill.id} className="flex items-center gap-3 p-2 bg-blue-50 rounded-lg group">

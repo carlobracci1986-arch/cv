@@ -34,7 +34,7 @@ const callOpenRouter = async (prompt: string, maxTokens = 4096): Promise<string>
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
-    throw new Error(err.error?.message || `API error: ${response.status}`);
+    throw new Error(err.error?.message || `Errore API: ${response.status}`);
   }
 
   const data = await response.json();
@@ -82,7 +82,7 @@ const parseJSON = <T>(text: string): T => {
     return JSON.parse(jsonStr);
   } catch (e) {
     // Try a more aggressive approach: find valid JSON chunks
-    console.warn('JSON parsing failed, attempting recovery:', e);
+    console.warn('Parsing JSON fallito, tentando recupero:', e);
 
     // Try to extract just the first valid JSON object/array
     const match = jsonStr.match(/\{(?:[^{}]|(?:\{[^{}]*\}))*\}/);
@@ -90,7 +90,7 @@ const parseJSON = <T>(text: string): T => {
       try {
         return JSON.parse(match[0]);
       } catch (e2) {
-        console.error('Recovery failed:', e2);
+        console.error('Recupero fallito:', e2);
       }
     }
 
