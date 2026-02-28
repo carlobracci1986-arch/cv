@@ -233,10 +233,13 @@ export const generateInterviewPrep = async (cvData: CVData, jobDescription: stri
     competenze: cvData.skills.map(s => s.name).slice(0, 15),
   };
 
+  // Strip spaces for character count, keep up to 5000 non-space chars
+  const jdCompact = jobDescription.replace(/\s+/g, ' ').trim();
+
   const prompt = `Sei un esperto recruiter italiano. Genera domande di colloquio basate su questo CV e job description.
 
-JOB DESCRIPTION (prime 800 parole):
-${jobDescription.substring(0, 800)}
+JOB DESCRIPTION:
+${jdCompact.substring(0, 5000)}
 
 CV RIASSUNTO:
 ${JSON.stringify(cvSummary, null, 1)}
@@ -278,7 +281,7 @@ REGOLE STRICT:
 - type weaknesses: "gap","frequent_change","missing_skill","inactivity"
 - difficulty/probability: "low","medium","high"`;
 
-  const text = await callClaude(prompt, 4000);
+  const text = await callClaude(prompt, 5000);
   return parseJSON<InterviewPrepResult>(text);
 };
 
