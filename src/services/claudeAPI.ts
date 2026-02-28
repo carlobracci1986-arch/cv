@@ -136,10 +136,28 @@ export const generateCoverLetter = async (
     technical: 'tecnico e preciso, focalizzato su competenze',
   };
 
+  const lengthDescriptions = {
+    brief: '2-3 paragrafi brevi (150-200 parole)',
+    full: '4-5 paragrafi completi (300-450 parole)',
+  };
+
+  const lengthGuidelines = {
+    brief: `STRUTTURA BREVE:
+- Paragrafo 1: Breve introduzione e motivazione (1-2 frasi)
+- Paragrafo 2: Una esperienza chiave / competenza rilevante (2-3 frasi)
+- Paragrafo 3: Chiusura propositiva (1-2 frasi)`,
+    full: `STRUTTURA COMPLETA:
+- Paragrafo 1: Introduzione accattivante e motivazione (2-3 frasi)
+- Paragrafo 2: Prima esperienza rilevante o competenza principale (2-3 frasi)
+- Paragrafo 3: Seconda esperienza o competenza complementare (2-3 frasi)
+- Paragrafo 4: Fit culturale e motivazione (1-2 frasi)
+- Paragrafo 5: Chiusura propositiva e call to action (1-2 frasi)`,
+  };
+
   const prompt = `Sei un esperto career coach italiano. Scrivi una lettera di presentazione personalizzata.
 
 TONO: ${toneDescriptions[options.tone]}
-LUNGHEZZA TARGET: 250-400 parole
+LUNGHEZZA: ${lengthDescriptions[options.length || 'full']}
 
 JOB DESCRIPTION:
 ${jobDescription}
@@ -151,11 +169,12 @@ ${options.additionalInstructions ? `ISTRUZIONI AGGIUNTIVE: ${options.additionalI
 
 REQUISITI LETTERA:
 1. Personalizzata per questa specifica offerta
-2. Evidenzia le 2-3 esperienze più rilevanti
+${options.length === 'brief' ? '2. Evidenzia 1 esperienza chiave' : '2. Evidenzia 2-3 esperienze più rilevanti'}
 3. Mostra motivazione e fit culturale
-4. Struttura: apertura accattivante, corpo (max 2 paragrafi), chiusura propositiva
+4. ${lengthGuidelines[options.length || 'full']}
 5. Includi keywords dall'offerta naturalmente
 6. NO cliché come "sono una persona dinamica e proattiva"
+7. Rispetta RIGOROSAMENTE la lunghezza indicata
 
 Scrivi SOLO la lettera di presentazione, senza commenti aggiuntivi.`;
 

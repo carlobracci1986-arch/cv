@@ -68,11 +68,13 @@ export const CoverLetterForm: React.FC<Props> = ({
   isLoading,
 }) => {
   const [selectedTone, setSelectedTone] = useState<CoverLetterOptions['tone']>('professional');
+  const [selectedLength, setSelectedLength] = useState<CoverLetterOptions['length']>('full');
   const [additionalInstructions, setAdditionalInstructions] = useState('');
 
   const handleGenerate = () => {
     onGenerate({
       tone: selectedTone,
+      length: selectedLength,
       additionalInstructions: additionalInstructions.trim() || undefined,
     });
   };
@@ -96,6 +98,37 @@ export const CoverLetterForm: React.FC<Props> = ({
               <span className="font-medium text-gray-700">{applicantName}</span>
             </p>
           )}
+        </div>
+      </div>
+
+      {/* Length selector */}
+      <div className="mb-5">
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Lunghezza della lettera
+        </label>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setSelectedLength('brief')}
+            disabled={isLoading}
+            className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed ${
+              selectedLength === 'brief'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Breve (2-3 paragrafi)
+          </button>
+          <button
+            onClick={() => setSelectedLength('full')}
+            disabled={isLoading}
+            className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed ${
+              selectedLength === 'full'
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            Completa (4-5 paragrafi)
+          </button>
         </div>
       </div>
 
