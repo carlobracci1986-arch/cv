@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Download, Sparkles, ChevronLeft, ChevronRight,
-  Palette, FolderOpen, Settings, Brain, Wand2
+  Palette, FolderOpen, Settings, Brain, Wand2, Menu, X
 } from 'lucide-react';
 
 import { useCV } from '../contexts/CVContext';
@@ -66,6 +66,7 @@ export const Editor: React.FC = () => {
   const [aiTab, setAITab] = useState<AITab>('optimizer');
   const [showPreview, setShowPreview] = useState(true);
   const [previewScale, setPreviewScale] = useState(0.45);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   // AI states
   const [jobDescription, setJobDescription] = useState('');
@@ -219,15 +220,15 @@ export const Editor: React.FC = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between z-10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 font-bold text-gray-900">
-            <Sparkles className="h-5 w-5 text-primary-600" />
-            <span className="text-lg">CV Builder AI</span>
+      <header className="bg-white border-b border-gray-200 px-3 md:px-4 py-2.5 md:py-3 flex items-center justify-between z-20 shadow-sm relative">
+        <div className="flex items-center gap-2 md:gap-4 flex-1 md:flex-none">
+          <div className="flex items-center gap-1.5 md:gap-2 font-bold text-gray-900">
+            <Sparkles className="h-4 md:h-5 w-4 md:w-5 text-primary-600" />
+            <span className="text-sm md:text-lg">CV Builder AI</span>
           </div>
 
-          {/* Main tabs */}
-          <nav className="hidden md:flex gap-1">
+          {/* Main tabs - Desktop */}
+          <nav className="hidden md:flex gap-1 ml-2">
             {([
               { id: 'editor', label: 'CV Editor', icon: null },
               { id: 'ai', label: 'AI Tools', icon: <Brain className="h-3.5 w-3.5" /> },
@@ -250,16 +251,19 @@ export const Editor: React.FC = () => {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="hidden sm:block text-xs text-gray-400">{lastSavedText}</span>
-          <div className={`w-2 h-2 rounded-full ${isDirty ? 'bg-yellow-400' : 'bg-green-400'}`} title={isDirty ? 'Modifiche non salvate' : 'Salvato'} />
+        {/* Status and Actions */}
+        <div className="flex items-center gap-2 md:gap-3">
+          <span className="hidden sm:block text-xs text-gray-400 whitespace-nowrap">{lastSavedText}</span>
+          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isDirty ? 'bg-yellow-400' : 'bg-green-400'}`} title={isDirty ? 'Modifiche non salvate' : 'Salvato'} />
 
-          {/* PDF Import */}
-          <PDFImportButton
-            onImport={(importedData) => updateCVData(importedData)}
-          />
+          {/* PDF Import - Icon only on mobile */}
+          <div className="hidden sm:block">
+            <PDFImportButton
+              onImport={(importedData) => updateCVData(importedData)}
+            />
+          </div>
 
-          {/* Mock Data Generator */}
+          {/* Mock Data Generator - Icon only on mobile */}
           <button
             onClick={() => {
               const mockData = generateMockCVData();
@@ -271,23 +275,86 @@ export const Editor: React.FC = () => {
                 requiresConsent: false
               });
             }}
-            title="Genera dati random per testare"
-            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            title="Genera dati di test"
+            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors flex-shrink-0"
           >
-            <Wand2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Test Data</span>
+            <Wand2 className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline whitespace-nowrap">Test Data</span>
           </button>
 
           <button
             onClick={handleDownloadPDF}
             disabled={isPdfLoading}
-            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-60"
+            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors disabled:opacity-60 flex-shrink-0"
           >
-            <Download className="h-4 w-4" />
-            {isPdfLoading ? 'Generando...' : 'Scarica PDF'}
+            <Download className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden sm:inline whitespace-nowrap">{isPdfLoading ? 'Generando...' : 'PDF'}</span>
+          </button>
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            title="Menu"
+          >
+            {showMobileMenu ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </button>
         </div>
       </header>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {showMobileMenu && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.15 }}
+            className="md:hidden bg-white border-b border-gray-200 overflow-hidden"
+          >
+            <nav className="flex flex-col divide-y divide-gray-100">
+              {([
+                { id: 'editor', label: 'CV Editor', icon: null },
+                { id: 'ai', label: 'AI Tools', icon: <Brain className="h-4 w-4" /> },
+                { id: 'versions', label: 'Versioni', icon: <FolderOpen className="h-4 w-4" /> },
+                { id: 'settings', label: 'Impostazioni', icon: <Settings className="h-4 w-4" /> },
+              ] as { id: MainTab; label: string; icon: React.ReactNode }[]).map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setMainTab(tab.id);
+                    setShowMobileMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
+                    mainTab === tab.id
+                      ? 'bg-primary-50 text-primary-700'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  {tab.icon}
+                  {tab.label}
+                </button>
+              ))}
+              {/* Additional mobile actions */}
+              <div className="px-4 py-3 space-y-2">
+                <div className="flex items-center justify-between text-xs text-gray-500 mb-2 pb-2 border-b border-gray-100">
+                  <span>Altre opzioni</span>
+                </div>
+                <PDFImportButton
+                  onImport={(importedData) => {
+                    updateCVData(importedData);
+                    setShowMobileMenu(false);
+                  }}
+                />
+              </div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
