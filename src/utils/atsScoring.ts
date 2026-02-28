@@ -217,19 +217,40 @@ Score: 90-100 = Eccellente, 70-89 = Buono, 50-69 = Migliorabile, 0-49 = Povero`;
     console.log('Claude response (first 200 chars):', responseText.substring(0, 200));
 
     // Parse JSON from response (handle markdown code blocks)
-    const jsonMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/) || responseText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('Failed to parse JSON from response:', responseText);
-      throw new Error('Failed to parse Claude response');
+    let jsonStr: string;
+
+    // Try markdown code block first
+    const markdownMatch = responseText.match(/```json\n?([\s\S]*?)\n?```/);
+    if (markdownMatch) {
+      jsonStr = markdownMatch[1];
+    } else {
+      // Try direct JSON match
+      const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('Failed to parse JSON from response:', responseText);
+        throw new Error('Failed to parse Claude response - no JSON found');
+      }
+      jsonStr = jsonMatch[0];
     }
 
-    const jsonStr = jsonMatch[1] || jsonMatch[0];
+    // Clean up the JSON string - remove problematic whitespace and escape issues
+    jsonStr = jsonStr
+      .replace(/\n\s*/g, ' ')  // Replace newlines and excessive whitespace with single space
+      .replace(/,\s*}/g, '}')   // Remove trailing commas before }
+      .replace(/,\s*\]/g, ']')  // Remove trailing commas before ]
+      .trim();
+
     console.log('Parsed JSON (first 200 chars):', jsonStr.substring(0, 200));
 
-    const result = JSON.parse(jsonStr) as ATSScoreResult;
-    console.log('ATS Evaluation completed successfully');
-
-    return result;
+    try {
+      const result = JSON.parse(jsonStr) as ATSScoreResult;
+      console.log('ATS Evaluation completed successfully');
+      return result;
+    } catch (parseError) {
+      console.error('JSON Parse error:', parseError);
+      console.error('Full JSON string:', jsonStr);
+      throw new Error(`Failed to parse JSON: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+    }
   } catch (error) {
     console.error('ATS Evaluation error:', error);
     if (error instanceof Error) {
