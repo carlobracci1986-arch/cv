@@ -52,19 +52,23 @@ const parseJSON = <T>(text: string): T => {
 
   // Clean up the JSON string carefully
   jsonStr = jsonStr
-    .replace(/\r/g, '')                    // Remove carriage returns
-    .replace(/\\n/g, '\\\\n')              // Escape literal \n in strings first
-    // Fix all newlines inside quoted strings - replace with space
-    .split('"').map((part, idx) => {
-      // Only process odd indices (content inside quotes)
-      if (idx % 2 === 1) {
-        return part.replace(/\n/g, ' ').replace(/\t/g, ' ').trim();
-      }
-      return part;
-    }).join('"')
-    .replace(/,\s*}/g, '}')                // Remove trailing commas before }
-    .replace(/,\s*\]/g, ']')               // Remove trailing commas before ]
-    .replace(/([^\\])\\([nrt])/g, '$1\\\\$2');        // Fix escaped special chars
+    .replace(/\r/g, '')                         // Remove carriage returns
+    .replace(/\n/g, ' ')                        // Replace all newlines with spaces first
+    .replace(/\s+/g, ' ')                       // Collapse multiple spaces
+    .replace(/:\s*"([^"]*)"/g, (match, p1) => {  // Fix all quoted strings
+      // Replace any remaining escape issues in quoted strings
+      const clean = p1
+        .replace(/\\+n/g, ' ')                  // Remove any escaped newlines
+        .replace(/\\+t/g, ' ')                  // Remove any escaped tabs
+        .replace(/\\/g, '\\\\')                 // Escape backslashes
+        .replace(/"/g, '\\"')                   // Escape unescaped quotes
+        .trim();
+      return `: "${clean}"`;
+    })
+    .replace(/,\s*}/g, '}')                     // Remove trailing commas before }
+    .replace(/,\s*\]/g, ']')                    // Remove trailing commas before ]
+    .replace(/:\s*\[\s*\]/g, ': []')            // Fix empty arrays
+    .replace(/:\s*\{\s*\}/g, ': {}');           // Fix empty objects
 
   try {
     return JSON.parse(jsonStr);
