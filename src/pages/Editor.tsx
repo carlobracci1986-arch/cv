@@ -8,6 +8,7 @@ import {
   PenLine, Eye, ZoomIn, ZoomOut, Trophy, ArrowLeft
 } from 'lucide-react';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { useWizard } from '../hooks/useWizard';
 
 import { useCV } from '../contexts/CVContext';
 import { usePrivacy } from '../contexts/PrivacyContext';
@@ -28,6 +29,9 @@ import { PDFImportButton } from '../components/PDFImportButton';
 import { VersionList } from '../components/VersionManager/VersionList';
 import { PrivacySettings } from '../components/Privacy/PrivacySettings';
 import { AIConsentDialog } from '../components/Privacy/AIConsentDialog';
+import { WelcomeModal } from '../components/wizard/WelcomeModal';
+import { WizardContainer } from '../components/wizard/WizardContainer';
+import { CompletionModal } from '../components/wizard/CompletionModal';
 import { AdvancedSettings } from '../components/Settings/AdvancedSettings';
 
 import { JobDescriptionInput } from '../components/AIFeatures/CVOptimizer/JobDescriptionInput';
@@ -66,6 +70,7 @@ export const Editor: React.FC = () => {
   const { hasAIConsent, saveAIConsent, grantAIConsent } = useConsent();
 
   const isMobile = useIsMobile();
+  const wizard = useWizard(cvData);
 
   const [mainTab, setMainTab] = useState<MainTab>('editor');
   const [editorSection, setEditorSection] = useState<EditorSection>('personal');
@@ -393,6 +398,45 @@ export const Editor: React.FC = () => {
         </div>
       )}
 
+      {/* Wizard Welcome Modal */}
+      <WelcomeModal
+        isOpen={wizard.showWelcome}
+        onStart={wizard.startWizard}
+        onSkip={wizard.skipWizard}
+      />
+
+      {/* Wizard Completion Modal */}
+      <CompletionModal
+        isOpen={wizard.showCompletion}
+        onViewPreview={() => {
+          wizard.completeWizard();
+          if (isMobile) setMobileView('preview');
+        }}
+        onDownloadPDF={() => {
+          wizard.completeWizard();
+          handleDownloadPDF();
+        }}
+        onClose={wizard.completeWizard}
+      />
+
+      {/* Wizard Mode */}
+      {wizard.isWizardMode ? (
+        <WizardContainer
+          cvData={cvData}
+          settings={settings}
+          steps={wizard.steps}
+          currentStep={wizard.currentStep}
+          isCurrentStepValid={wizard.isCurrentStepValid}
+          completionPercent={wizard.completionPercent}
+          getStepValidation={wizard.getStepValidation}
+          onNext={wizard.nextStep}
+          onPrev={wizard.prevStep}
+          onGoToStep={wizard.goToStep}
+          onExit={wizard.exitWizard}
+          onUpdateCVData={updateCVData}
+        />
+      ) : (
+      <>
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel - form (hidden on mobile when preview active) */}
@@ -798,6 +842,9 @@ export const Editor: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      </>
       )}
 
       {/* Modals */}
