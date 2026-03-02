@@ -29,18 +29,8 @@ const AppContent: React.FC = () => {
         {/* Landing page - no editor layout */}
         <Route path="/" element={<Landing />} />
 
-        {/* Editor with original layout */}
-        <Route
-          path="/editor"
-          element={
-            <div className="min-h-screen flex flex-col">
-              <div className="flex-1">
-                <Editor />
-              </div>
-              <Footer />
-            </div>
-          }
-        />
+        {/* Editor - full screen layout (Editor gestisce il proprio layout) */}
+        <Route path="/editor" element={<Editor />} />
 
         {/* Legal pages */}
         <Route

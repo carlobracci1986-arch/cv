@@ -41,7 +41,8 @@ function darkenColor(hex: string, amount: number): string {
 }
 
 export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
-  const { personalInfo, professionalSummary, experiences, education, skills, languages, other } = cvData;
+  const { personalInfo, professionalSummary, experiences, education, skills, languages } = cvData;
+  const other = cvData.other || { certifications: [], drivingLicenses: [], hobbies: [] };
   const { accentColor, fontSize, spacing, showPhoto, showSections, sectionOrder } = settings;
 
   const baseFontSize = fontSizeMap[fontSize];
