@@ -1,10 +1,13 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Download, Sparkles, ChevronLeft, ChevronRight,
-  Palette, FolderOpen, Settings, Brain, Wand2, Menu, X
+  Palette, FolderOpen, Settings, Brain, Wand2, Menu, X,
+  PenLine, Eye, ZoomIn, ZoomOut, Trophy, ArrowLeft
 } from 'lucide-react';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 import { useCV } from '../contexts/CVContext';
 import { usePrivacy } from '../contexts/PrivacyContext';
@@ -45,6 +48,7 @@ import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuesti
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
 type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'other' | 'protected';
 type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview';
+type MobileView = 'form' | 'preview';
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string }[] = [
   { id: 'personal', label: 'Dati Personali' },
@@ -61,12 +65,16 @@ export const Editor: React.FC = () => {
   const { addActivity } = usePrivacy();
   const { hasAIConsent, saveAIConsent, grantAIConsent } = useConsent();
 
+  const isMobile = useIsMobile();
+
   const [mainTab, setMainTab] = useState<MainTab>('editor');
   const [editorSection, setEditorSection] = useState<EditorSection>('personal');
   const [aiTab, setAITab] = useState<AITab>('optimizer');
   const [showPreview, setShowPreview] = useState(true);
   const [previewScale, setPreviewScale] = useState(0.45);
+  const [mobilePreviewScale, setMobilePreviewScale] = useState(0.5);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [mobileView, setMobileView] = useState<MobileView>('form');
 
   // AI states
   const [jobDescription, setJobDescription] = useState('');
@@ -222,16 +230,18 @@ export const Editor: React.FC = () => {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 px-3 md:px-4 py-2.5 md:py-3 flex items-center justify-between z-20 shadow-sm relative">
         <div className="flex items-center gap-2 md:gap-4 flex-1 md:flex-none">
-          <div className="flex items-center gap-1.5 md:gap-2 font-bold text-gray-900">
-            <Sparkles className="h-4 md:h-5 w-4 md:w-5 text-primary-600" />
-            <span className="text-sm md:text-lg">CV Builder AI</span>
-          </div>
+          <Link to="/" className="flex items-center gap-1.5 md:gap-2 font-bold text-gray-900">
+            <div className="w-7 h-7 md:w-8 md:h-8 bg-brand-blue rounded-lg flex items-center justify-center">
+              <Trophy className="h-3.5 md:h-4 w-3.5 md:w-4 text-white" />
+            </div>
+            <span className="text-sm md:text-lg font-heading">CV<span className="text-brand-blue">Vincente</span></span>
+          </Link>
 
           {/* Main tabs - Desktop */}
           <nav className="hidden md:flex gap-1 ml-2">
             {([
-              { id: 'editor', label: 'CV Editor', icon: null },
-              { id: 'ai', label: 'AI Tools', icon: <Brain className="h-3.5 w-3.5" /> },
+              { id: 'editor', label: 'Editor CV', icon: null },
+              { id: 'ai', label: 'Strumenti IA', icon: <Brain className="h-3.5 w-3.5" /> },
               { id: 'versions', label: 'Versioni', icon: <FolderOpen className="h-3.5 w-3.5" /> },
               { id: 'settings', label: 'Impostazioni', icon: <Settings className="h-3.5 w-3.5" /> },
             ] as { id: MainTab; label: string; icon: React.ReactNode }[]).map(tab => (
@@ -254,16 +264,16 @@ export const Editor: React.FC = () => {
         {/* Status and Actions */}
         <div className="flex items-center gap-2 md:gap-3">
           <span className="hidden sm:block text-xs text-gray-400 whitespace-nowrap">{lastSavedText}</span>
-          <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isDirty ? 'bg-yellow-400' : 'bg-green-400'}`} title={isDirty ? 'Modifiche non salvate' : 'Salvato'} />
+          <div className={`hidden sm:block w-2 h-2 rounded-full flex-shrink-0 ${isDirty ? 'bg-yellow-400' : 'bg-green-400'}`} title={isDirty ? 'Modifiche non salvate' : 'Salvato'} />
 
-          {/* PDF Import - Icon only on mobile */}
+          {/* PDF Import - Desktop only */}
           <div className="hidden sm:block">
             <PDFImportButton
               onImport={(importedData) => updateCVData(importedData)}
             />
           </div>
 
-          {/* Mock Data Generator - Icon only on mobile */}
+          {/* Mock Data Generator - Desktop only */}
           <button
             onClick={() => {
               const mockData = generateMockCVData();
@@ -276,16 +286,17 @@ export const Editor: React.FC = () => {
               });
             }}
             title="Genera dati di test"
-            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors flex-shrink-0"
+            className="hidden sm:flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors flex-shrink-0"
           >
             <Wand2 className="h-4 w-4 flex-shrink-0" />
-            <span className="hidden sm:inline whitespace-nowrap">Test Data</span>
+            <span className="hidden sm:inline whitespace-nowrap">Dati Test</span>
           </button>
 
+          {/* Download PDF - Desktop */}
           <button
             onClick={handleDownloadPDF}
             disabled={isPdfLoading}
-            className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors disabled:opacity-60 flex-shrink-0"
+            className="hidden sm:flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors disabled:opacity-60 flex-shrink-0"
           >
             <Download className="h-4 w-4 flex-shrink-0" />
             <span className="hidden sm:inline whitespace-nowrap">{isPdfLoading ? 'Generando...' : 'PDF'}</span>
@@ -294,7 +305,7 @@ export const Editor: React.FC = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
             title="Menu"
           >
             {showMobileMenu ? (
@@ -314,12 +325,12 @@ export const Editor: React.FC = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.15 }}
-            className="md:hidden bg-white border-b border-gray-200 overflow-hidden"
+            className="md:hidden bg-white border-b border-gray-200 overflow-hidden z-10"
           >
             <nav className="flex flex-col divide-y divide-gray-100">
               {([
-                { id: 'editor', label: 'CV Editor', icon: null },
-                { id: 'ai', label: 'AI Tools', icon: <Brain className="h-4 w-4" /> },
+                { id: 'editor', label: 'Editor CV', icon: <PenLine className="h-4 w-4" /> },
+                { id: 'ai', label: 'Strumenti IA', icon: <Brain className="h-4 w-4" /> },
                 { id: 'versions', label: 'Versioni', icon: <FolderOpen className="h-4 w-4" /> },
                 { id: 'settings', label: 'Impostazioni', icon: <Settings className="h-4 w-4" /> },
               ] as { id: MainTab; label: string; icon: React.ReactNode }[]).map(tab => (
@@ -327,9 +338,10 @@ export const Editor: React.FC = () => {
                   key={tab.id}
                   onClick={() => {
                     setMainTab(tab.id);
+                    setMobileView('form');
                     setShowMobileMenu(false);
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center gap-3 px-4 py-3.5 text-sm font-medium transition-colors ${
                     mainTab === tab.id
                       ? 'bg-primary-50 text-primary-700'
                       : 'text-gray-700 hover:bg-gray-50'
@@ -341,9 +353,6 @@ export const Editor: React.FC = () => {
               ))}
               {/* Additional mobile actions */}
               <div className="px-4 py-3 space-y-2">
-                <div className="flex items-center justify-between text-xs text-gray-500 mb-2 pb-2 border-b border-gray-100">
-                  <span>Altre opzioni</span>
-                </div>
                 <PDFImportButton
                   onImport={(importedData) => {
                     updateCVData(importedData);
@@ -356,10 +365,38 @@ export const Editor: React.FC = () => {
         )}
       </AnimatePresence>
 
+      {/* Mobile Tab Bar: Compila / Anteprima */}
+      {isMobile && mainTab === 'editor' && (
+        <div className="md:hidden flex bg-white border-b border-gray-200">
+          <button
+            onClick={() => setMobileView('form')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors ${
+              mobileView === 'form'
+                ? 'text-brand-blue border-b-2 border-brand-blue bg-blue-50/50'
+                : 'text-gray-500'
+            }`}
+          >
+            <PenLine className="w-4 h-4" />
+            Compila
+          </button>
+          <button
+            onClick={() => setMobileView('preview')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-colors ${
+              mobileView === 'preview'
+                ? 'text-brand-blue border-b-2 border-brand-blue bg-blue-50/50'
+                : 'text-gray-500'
+            }`}
+          >
+            <Eye className="w-4 h-4" />
+            Anteprima
+          </button>
+        </div>
+      )}
+
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left panel */}
-        <div className="w-full md:w-1/2 lg:w-5/12 flex flex-col overflow-hidden border-r border-gray-200 bg-white">
+        {/* Left panel - form (hidden on mobile when preview active) */}
+        <div className={`${isMobile && mobileView === 'preview' ? 'hidden' : 'flex'} w-full md:w-1/2 lg:w-5/12 flex-col overflow-hidden border-r border-gray-200 bg-white ${isMobile ? 'pb-20' : ''}`}>
           {mainTab === 'editor' && (
             <>
               {/* Section tabs */}
@@ -661,31 +698,107 @@ export const Editor: React.FC = () => {
           )}
         </div>
 
-        {/* Right panel - Preview */}
-        <div className="hidden md:flex flex-col flex-1 overflow-hidden bg-gray-100">
+        {/* Right panel - Preview (desktop always, mobile only when preview tab active) */}
+        <div className={`${isMobile ? (mobileView === 'preview' ? 'flex' : 'hidden') : 'hidden md:flex'} flex-col flex-1 overflow-hidden bg-gray-100 ${isMobile ? 'pb-20' : ''}`}>
           {/* Preview toolbar */}
           <div className="flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200">
             <span className="text-sm font-medium text-gray-600">Anteprima CV</span>
             <div className="flex items-center gap-2">
-              <button onClick={() => setPreviewScale(s => Math.max(0.3, s - 0.05))} className="px-2 py-1 text-xs border border-gray-200 rounded hover:bg-gray-50">−</button>
-              <span className="text-xs text-gray-500 w-12 text-center">{Math.round(previewScale * 100)}%</span>
-              <button onClick={() => setPreviewScale(s => Math.min(1, s + 0.05))} className="px-2 py-1 text-xs border border-gray-200 rounded hover:bg-gray-50">+</button>
+              <button
+                onClick={() => isMobile ? setMobilePreviewScale(s => Math.max(0.3, s - 0.1)) : setPreviewScale(s => Math.max(0.3, s - 0.05))}
+                className="w-9 h-9 md:w-auto md:h-auto md:px-2 md:py-1 flex items-center justify-center text-xs border border-gray-200 rounded-lg md:rounded hover:bg-gray-50"
+              >
+                <ZoomOut className="w-4 h-4 md:hidden" />
+                <span className="hidden md:inline">&minus;</span>
+              </button>
+              <span className="text-xs text-gray-500 w-12 text-center">{Math.round((isMobile ? mobilePreviewScale : previewScale) * 100)}%</span>
+              <button
+                onClick={() => isMobile ? setMobilePreviewScale(s => Math.min(1, s + 0.1)) : setPreviewScale(s => Math.min(1, s + 0.05))}
+                className="w-9 h-9 md:w-auto md:h-auto md:px-2 md:py-1 flex items-center justify-center text-xs border border-gray-200 rounded-lg md:rounded hover:bg-gray-50"
+              >
+                <ZoomIn className="w-4 h-4 md:hidden" />
+                <span className="hidden md:inline">+</span>
+              </button>
             </div>
           </div>
 
           {/* Preview container */}
-          <div className="flex-1 overflow-auto flex justify-center p-6">
+          <div className="flex-1 overflow-auto flex justify-center p-4 md:p-6">
             <div style={{ transformOrigin: 'top center' }}>
               <CVPreview
                 cvData={cvData}
                 settings={settings}
-                scale={previewScale}
+                scale={isMobile ? mobilePreviewScale : previewScale}
                 id="cv-preview-export"
               />
             </div>
           </div>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 z-50 safe-area-bottom">
+          {mainTab === 'editor' && mobileView === 'form' && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  saveVersion('Bozza');
+                  toast.success('Bozza salvata!');
+                }}
+                className="flex-1 h-12 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors active:bg-gray-50"
+              >
+                Salva bozza
+              </button>
+              <button
+                onClick={() => setMobileView('preview')}
+                className="flex-1 h-12 flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold rounded-xl text-sm transition-colors active:bg-blue-700"
+              >
+                Vedi anteprima
+                <Eye className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          {mainTab === 'editor' && mobileView === 'preview' && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => setMobileView('form')}
+                className="flex-1 h-12 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors active:bg-gray-50"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Modifica
+              </button>
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isPdfLoading}
+                className="flex-1 h-12 flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold rounded-xl text-sm transition-colors active:bg-blue-700 disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                {isPdfLoading ? 'Generando...' : 'Scarica PDF'}
+              </button>
+            </div>
+          )}
+          {mainTab !== 'editor' && (
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setMainTab('editor'); setMobileView('form'); }}
+                className="flex-1 h-12 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors active:bg-gray-50"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Torna al CV
+              </button>
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isPdfLoading}
+                className="flex-1 h-12 flex items-center justify-center gap-2 bg-brand-blue text-white font-semibold rounded-xl text-sm transition-colors active:bg-blue-700 disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                {isPdfLoading ? 'Generando...' : 'Scarica PDF'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Modals */}
       {showOptimizationModal && optimizationResult && (

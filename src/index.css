@@ -45,6 +45,44 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* Safe area for iPhone notch/bottom bar */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+/* Mobile: prevent iOS zoom on input focus (must be >= 16px) */
+@media (max-width: 767px) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+
+  /* Touch-friendly input heights */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="number"],
+  input[type="date"],
+  input[type="password"],
+  textarea,
+  select {
+    min-height: 48px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  /* Touch-friendly buttons */
+  button {
+    min-height: 44px;
+  }
+
+  /* Smooth scrolling on touch */
+  .overflow-y-auto,
+  .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* CV Preview styles for print */
