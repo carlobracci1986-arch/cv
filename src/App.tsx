@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { CVProvider } from './contexts/CVContext';
 import { PrivacyProvider } from './contexts/PrivacyContext';
+import { Landing } from './pages/Landing';
 import { Editor } from './pages/Editor';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Terms } from './pages/Terms';
@@ -24,19 +25,53 @@ const AppContent: React.FC = () => {
   return (
     <BrowserRouter>
       <ConsentModal isOpen={!consent.hasConsented} onConsent={handleConsent} />
-      <div className="min-h-screen flex flex-col">
-        <div className="flex-1">
-          <Routes>
-            <Route path="/" element={<Editor />} />
-            <Route path="/editor" element={<Navigate to="/" replace />} />
-            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/cookie-policy" element={<CookiePolicy />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
-        <Footer />
-      </div>
+      <Routes>
+        {/* Landing page - no editor layout */}
+        <Route path="/" element={<Landing />} />
+
+        {/* Editor with original layout */}
+        <Route
+          path="/editor"
+          element={
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1">
+                <Editor />
+              </div>
+              <Footer />
+            </div>
+          }
+        />
+
+        {/* Legal pages */}
+        <Route
+          path="/privacy-policy"
+          element={
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1"><PrivacyPolicy /></div>
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1"><Terms /></div>
+              <Footer />
+            </div>
+          }
+        />
+        <Route
+          path="/cookie-policy"
+          element={
+            <div className="min-h-screen flex flex-col">
+              <div className="flex-1"><CookiePolicy /></div>
+              <Footer />
+            </div>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
 
       <Toaster
         position="bottom-right"

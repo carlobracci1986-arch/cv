@@ -19,9 +19,15 @@ export default {
           800: '#1e40af',
           900: '#1e3a8a',
         },
+        brand: {
+          blue: '#2563eb',
+          green: '#10b981',
+          orange: '#f59e0b',
+        },
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        heading: ['Outfit', 'Inter', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.2s ease-in-out',
