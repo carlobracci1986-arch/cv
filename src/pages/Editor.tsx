@@ -32,6 +32,10 @@ import { AIConsentDialog } from '../components/Privacy/AIConsentDialog';
 import { WelcomeModal } from '../components/wizard/WelcomeModal';
 import { WizardContainer } from '../components/wizard/WizardContainer';
 import { CompletionModal } from '../components/wizard/CompletionModal';
+import { AIBadge } from '../components/ai-ui/AIBadge';
+import { AIFloatingButton } from '../components/ai-ui/AIFloatingButton';
+import { AIPromptBanner } from '../components/ai-ui/AIPromptBanner';
+import { AIProcessingModal } from '../components/ai-ui/AIProcessingModal';
 import { AdvancedSettings } from '../components/Settings/AdvancedSettings';
 
 import { JobDescriptionInput } from '../components/AIFeatures/CVOptimizer/JobDescriptionInput';
@@ -54,12 +58,12 @@ type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skil
 type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview';
 type MobileView = 'form' | 'preview';
 
-const EDITOR_SECTIONS: { id: EditorSection; label: string }[] = [
+const EDITOR_SECTIONS: { id: EditorSection; label: string; aiOptimizable?: boolean }[] = [
   { id: 'personal', label: 'Dati Personali' },
-  { id: 'summary', label: 'Profilo' },
-  { id: 'experience', label: 'Esperienze' },
+  { id: 'summary', label: 'Profilo', aiOptimizable: true },
+  { id: 'experience', label: 'Esperienze', aiOptimizable: true },
   { id: 'education', label: 'Formazione' },
-  { id: 'skills', label: 'Competenze' },
+  { id: 'skills', label: 'Competenze', aiOptimizable: true },
   { id: 'other', label: 'Altro' },
   { id: 'protected', label: 'Categorie Protette' },
 ];
@@ -241,6 +245,7 @@ export const Editor: React.FC = () => {
             </div>
             <span className="text-sm md:text-lg font-heading">CV<span className="text-brand-blue">Vincente</span></span>
           </Link>
+          <AIBadge variant="header" />
 
           {/* Main tabs - Desktop */}
           <nav className="hidden md:flex gap-1 ml-2">
@@ -398,6 +403,26 @@ export const Editor: React.FC = () => {
         </div>
       )}
 
+      {/* Banner IA - visibile sopra il contenuto quando in modalità editor */}
+      {!wizard.isWizardMode && mainTab === 'editor' && (
+        <AIPromptBanner
+          onOptimize={() => { setMainTab('ai'); setAITab('optimizer'); }}
+          hasJobDescription={!!jobDescription.trim()}
+          visible={!wizard.showWelcome}
+        />
+      )}
+
+      {/* Modale elaborazione IA */}
+      <AIProcessingModal isOpen={isOptimizing} />
+
+      {/* Pulsante fluttuante IA (mobile) */}
+      {!wizard.isWizardMode && mainTab === 'editor' && (
+        <AIFloatingButton
+          onClick={() => { setMainTab('ai'); setAITab('optimizer'); if (isMobile) setShowMobileMenu(false); }}
+          hasUsedAI={!!optimizationResult}
+        />
+      )}
+
       {/* Wizard Welcome Modal */}
       <WelcomeModal
         isOpen={wizard.showWelcome}
@@ -449,13 +474,14 @@ export const Editor: React.FC = () => {
                   <button
                     key={sec.id}
                     onClick={() => setEditorSection(sec.id)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1 ${
                       editorSection === sec.id
                         ? 'bg-white text-primary-700 shadow-sm border border-gray-200'
                         : 'text-gray-500 hover:text-gray-700'
                     }`}
                   >
                     {sec.label}
+                    {sec.aiOptimizable && <Sparkles className="w-3 h-3 text-purple-400" />}
                   </button>
                 ))}
               </div>
