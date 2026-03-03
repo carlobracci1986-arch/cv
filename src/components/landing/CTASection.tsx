@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { analytics } from '../../utils/analytics';
+import { ANALYTICS_EVENTS } from '../../constants/analyticsEvents';
 
 export const CTASection: React.FC = () => {
   return (
@@ -34,6 +36,7 @@ export const CTASection: React.FC = () => {
 
           <Link
             to="/editor"
+            onClick={() => analytics.trackEvent(ANALYTICS_EVENTS.LANDING_CTA_CLICK, { button: 'cta_bottom' })}
             className="inline-flex items-center gap-3 px-10 py-5 bg-white text-brand-blue text-lg font-bold rounded-2xl hover:bg-blue-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
           >
             Crea il tuo CV gratis

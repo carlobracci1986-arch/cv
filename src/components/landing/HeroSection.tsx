@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, ArrowRight, ArrowDown, Shield, Lock, Heart, Sparkles } from 'lucide-react';
+import { analytics } from '../../utils/analytics';
+import { ANALYTICS_EVENTS } from '../../constants/analyticsEvents';
 
 const usps = [
   'Ottimizzazione IA basata sull\'annuncio di lavoro',
@@ -121,6 +123,7 @@ export const HeroSection: React.FC = () => {
             >
               <Link
                 to="/editor"
+                onClick={() => analytics.trackEvent(ANALYTICS_EVENTS.LANDING_CTA_CLICK, { button: 'hero_primary' })}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-blue text-white text-lg font-semibold rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5"
               >
                 Crea il tuo CV gratis

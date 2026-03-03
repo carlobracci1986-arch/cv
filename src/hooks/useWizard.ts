@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CVData } from '../types/cv.types';
+import { analytics } from '../utils/analytics';
+import { ANALYTICS_EVENTS } from '../constants/analyticsEvents';
 
 const STORAGE_KEY = 'cv_wizard_progress';
 const FIRST_VISIT_KEY = 'cv_wizard_first_visit';
@@ -31,6 +33,7 @@ export function useWizard(cvData: CVData) {
     if (!visited) {
       setIsFirstVisit(true);
       setShowWelcome(true);
+      analytics.trackEvent(ANALYTICS_EVENTS.WELCOME_SHOWN);
     }
   }, []);
 
@@ -59,6 +62,7 @@ export function useWizard(cvData: CVData) {
     setIsWizardMode(true);
     setCurrentStep(0);
     localStorage.setItem(FIRST_VISIT_KEY, 'true');
+    analytics.trackEvent(ANALYTICS_EVENTS.WIZARD_STARTED);
   }, []);
 
   const skipWizard = useCallback(() => {
@@ -67,13 +71,17 @@ export function useWizard(cvData: CVData) {
     setIsFirstVisit(false);
     localStorage.setItem(FIRST_VISIT_KEY, 'true');
     localStorage.removeItem(STORAGE_KEY);
+    analytics.trackEvent(ANALYTICS_EVENTS.WIZARD_SKIPPED);
   }, []);
 
   const nextStep = useCallback(() => {
     if (currentStep < STEPS.length - 1) {
-      setCurrentStep(s => s + 1);
+      const nextIdx = currentStep + 1;
+      setCurrentStep(nextIdx);
+      analytics.trackEvent(ANALYTICS_EVENTS.WIZARD_STEP_CHANGED, { step: STEPS[nextIdx].id, step_number: nextIdx + 1 });
     } else {
       setShowCompletion(true);
+      analytics.trackEvent(ANALYTICS_EVENTS.WIZARD_COMPLETED, { steps_count: STEPS.length });
     }
   }, [currentStep]);
 
@@ -94,7 +102,8 @@ export function useWizard(cvData: CVData) {
   const exitWizard = useCallback(() => {
     setIsWizardMode(false);
     localStorage.removeItem(STORAGE_KEY);
-  }, []);
+    analytics.trackEvent(ANALYTICS_EVENTS.WIZARD_ABANDONED, { abandoned_at_step: currentStep + 1 });
+  }, [currentStep]);
 
   // Validazione passaggio corrente
   const getStepValidation = useCallback((stepIndex: number): { valid: boolean; missing: string[] } => {

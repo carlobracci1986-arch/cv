@@ -52,6 +52,10 @@ import * as aiProvider from '../services/aiProvider';
 import { generatePDFFromElement, generateFilename } from '../utils/pdfGenerator';
 import { evaluateATSWithClaude } from '../utils/atsScoring';
 import { generateMockCVData } from '../services/mockDataGenerator';
+import { analytics } from '../utils/analytics';
+import { ANALYTICS_EVENTS } from '../constants/analyticsEvents';
+import { conversionFunnel, FUNNEL_STAGES } from '../utils/conversionFunnel';
+import { useTrackTime } from '../hooks/useTrackEvent';
 import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuestion, CoverLetterOptions } from '../types/ai.types';
 
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
@@ -112,6 +116,14 @@ export const Editor: React.FC = () => {
 
   const previewRef = useRef<HTMLDivElement>(null);
 
+  // Analytics: traccia tempo nell'editor e apertura funnel
+  useTrackTime('editor');
+  React.useEffect(() => {
+    conversionFunnel.markStage(FUNNEL_STAGES.EDITOR_OPENED, {
+      device: isMobile ? 'mobile' : 'desktop',
+    });
+  }, []);
+
   const requireAIConsent = useCallback((action: string, fn: () => Promise<void>) => {
     if (hasAIConsent && saveAIConsent) {
       fn();
@@ -137,13 +149,25 @@ export const Editor: React.FC = () => {
     }
     requireAIConsent('Ottimizzazione CV', async () => {
       setIsOptimizing(true);
+      analytics.trackEvent(ANALYTICS_EVENTS.AI_OPTIMIZE_STARTED, {
+        job_description_length: jobDescription.length,
+        device: isMobile ? 'mobile' : 'desktop',
+      });
+      const t0 = Date.now();
       try {
         const result = await aiProvider.optimizeCV(cvData, jobDescription);
         setOptimizationResult(result);
         setShowOptimizationModal(true);
         addActivity({ action: 'ai_optimization', details: `Match score: ${result.matchScore}%`, requiresConsent: true });
+        analytics.trackEvent(ANALYTICS_EVENTS.AI_OPTIMIZE_COMPLETED, {
+          match_score: result.matchScore,
+          changes_count: result.changes?.length || 0,
+          duration_ms: Date.now() - t0,
+        });
+        conversionFunnel.markStage(FUNNEL_STAGES.AI_USED);
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Errore ottimizzazione');
+        analytics.trackEvent(ANALYTICS_EVENTS.AI_OPTIMIZE_ERROR, { duration_ms: Date.now() - t0 });
       } finally {
         setIsOptimizing(false);
       }
@@ -162,14 +186,17 @@ export const Editor: React.FC = () => {
     updateCVData(optimizationResult.optimizedCV);
     setShowOptimizationModal(false);
     toast.success(`${accepted.length} modifiche applicate!`);
+    analytics.trackEvent(ANALYTICS_EVENTS.AI_CHANGES_APPLIED, { accepted_count: accepted.length, total_count: changes.length });
   };
 
   const handleCheckATS = async () => {
     setIsCheckingATS(true);
+    analytics.trackEvent(ANALYTICS_EVENTS.ATS_CHECK_STARTED);
     try {
       const result = await evaluateATSWithClaude(cvData, settings);
       setAtsResult(result);
       toast.success('Valutazione ATS completata con Claude AI!');
+      analytics.trackEvent(ANALYTICS_EVENTS.ATS_CHECK_COMPLETED, { score: result.score });
     } catch (error) {
       console.error('ATS evaluation error:', error);
       toast.error('Errore nella valutazione ATS. Verifica la configurazione di Claude API.');
@@ -185,6 +212,7 @@ export const Editor: React.FC = () => {
         const letter = await aiProvider.generateCoverLetter(cvData, jobDescription, options);
         setCoverLetter(letter);
         addActivity({ action: 'ai_cover_letter', details: `Tono: ${options.tone}`, requiresConsent: true });
+        analytics.trackEvent(ANALYTICS_EVENTS.COVER_LETTER_GENERATED, { tone: options.tone });
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Errore generazione lettera');
       } finally {
@@ -200,6 +228,7 @@ export const Editor: React.FC = () => {
         const result = await aiProvider.generateInterviewPrep(cvData, jobDescription);
         setInterviewQuestions(result.questions);
         addActivity({ action: 'ai_interview_prep', details: `${result.questions.length} domande generate`, requiresConsent: true });
+        analytics.trackEvent(ANALYTICS_EVENTS.INTERVIEW_PREP_GENERATED, { questions_count: result.questions.length });
       } catch (err) {
         toast.error(err instanceof Error ? err.message : 'Errore generazione domande');
       } finally {
@@ -214,6 +243,8 @@ export const Editor: React.FC = () => {
     setIsPdfLoading(true);
     setExportPhase('generating');
     setShowExportModal(true);
+    analytics.trackEvent(ANALYTICS_EVENTS.PDF_EXPORT_STARTED, { device: isMobile ? 'mobile' : 'desktop' });
+    const t0 = Date.now();
     try {
       const filename = generateFilename(cvData.personalInfo.firstName, cvData.personalInfo.lastName);
       await generatePDFFromElement(el, {
@@ -224,9 +255,12 @@ export const Editor: React.FC = () => {
       });
       addActivity({ action: 'cv_exported', details: filename, requiresConsent: false });
       setExportPhase('celebration');
+      analytics.trackEvent(ANALYTICS_EVENTS.PDF_EXPORT_COMPLETED, { duration_ms: Date.now() - t0 });
+      conversionFunnel.markStage(FUNNEL_STAGES.PDF_EXPORTED);
     } catch (err) {
       setShowExportModal(false);
       toast.error('Errore generazione PDF');
+      analytics.trackEvent(ANALYTICS_EVENTS.PDF_EXPORT_ERROR);
     } finally {
       setIsPdfLoading(false);
     }
@@ -479,7 +513,7 @@ export const Editor: React.FC = () => {
                 {EDITOR_SECTIONS.map(sec => (
                   <button
                     key={sec.id}
-                    onClick={() => setEditorSection(sec.id)}
+                    onClick={() => { setEditorSection(sec.id); analytics.trackEvent(ANALYTICS_EVENTS.SECTION_OPENED, { section: sec.id }); }}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap flex items-center gap-1 ${
                       editorSection === sec.id
                         ? 'bg-white text-primary-700 shadow-sm border border-gray-200'
@@ -744,7 +778,7 @@ export const Editor: React.FC = () => {
                 onLoad={loadVersion}
                 onDelete={deleteVersion}
                 onDuplicate={duplicateVersion}
-                onSaveNew={name => { saveVersion(name); toast.success(`Versione "${name}" salvata!`); }}
+                onSaveNew={name => { saveVersion(name); toast.success(`Versione "${name}" salvata!`); analytics.trackEvent(ANALYTICS_EVENTS.VERSION_SAVED); }}
               />
             </div>
           )}
