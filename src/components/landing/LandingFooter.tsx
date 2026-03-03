@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy } from 'lucide-react';
+import { Trophy, ShieldCheck, Lock, Shield, Heart } from 'lucide-react';
 
 const links = [
   { label: 'Politica sulla Riservatezza', to: '/privacy-policy' },
@@ -8,9 +8,30 @@ const links = [
   { label: 'Politica sui Cookie', to: '/cookie-policy' },
 ];
 
+const trustItems = [
+  { icon: ShieldCheck, label: 'Conforme GDPR', color: 'text-green-400' },
+  { icon: Lock, label: 'Privacy First', color: 'text-blue-400' },
+  { icon: Shield, label: 'SSL/TLS', color: 'text-purple-400' },
+  { icon: Heart, label: 'Made in Italy', color: 'text-red-400' },
+];
+
 export const LandingFooter: React.FC = () => {
   return (
     <footer className="bg-gray-900 text-gray-400">
+      {/* Trust badges row */}
+      <div className="border-b border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10">
+            {trustItems.map((item, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <item.icon className={`w-4 h-4 ${item.color}`} />
+                <span className="text-sm text-gray-400 font-medium">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Logo + tagline */}

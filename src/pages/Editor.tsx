@@ -38,6 +38,7 @@ import { AIPromptBanner } from '../components/ai-ui/AIPromptBanner';
 import { AIProcessingModal } from '../components/ai-ui/AIProcessingModal';
 import { ExportCelebrationModal } from '../components/export/ExportCelebrationModal';
 import { AdvancedSettings } from '../components/Settings/AdvancedSettings';
+import { PrivacyIndicator } from '../components/trust/PrivacyIndicator';
 
 import { JobDescriptionInput } from '../components/AIFeatures/CVOptimizer/JobDescriptionInput';
 import { OptimizationModal } from '../components/AIFeatures/CVOptimizer/OptimizationModal';
@@ -538,6 +539,7 @@ export const Editor: React.FC = () => {
                   >
                     {editorSection === 'personal' && (
                       <div className="space-y-6">
+                        <PrivacyIndicator />
                         {settings.showPhoto && (
                           <div>
                             <h3 className="text-sm font-semibold text-gray-700 mb-3">Foto Profilo</h3>
