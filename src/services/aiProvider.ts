@@ -61,6 +61,15 @@ export const evaluateMockAnswer = async (
   return openrouterAPI.evaluateMockAnswer(question, answer, jobDescription);
 };
 
+export const extractTextFromImages = async (
+  images: { base64: string; mediaType: string }[]
+): Promise<string> => {
+  const provider = getProvider();
+  if (provider === 'claude') return claudeAPI.extractTextFromImages(images);
+  if (provider === 'gemini') return geminiAPI.extractTextFromImages(images);
+  return openrouterAPI.extractTextFromImages(images);
+};
+
 // Funzione helper per ottenere il provider attuale (utile per debug/UI)
 export const getCurrentProvider = (): string => {
   return getProvider();

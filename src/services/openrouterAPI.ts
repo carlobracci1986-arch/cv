@@ -261,6 +261,60 @@ difficulty e probability: "low", "medium", "high"`;
   return parseJSON<InterviewPrepResult>(text);
 };
 
+export const extractTextFromImages = async (
+  images: { base64: string; mediaType: string }[]
+): Promise<string> => {
+  const apiKey = getApiKey();
+
+  const imageContent = images.map((img) => ({
+    type: 'image_url' as const,
+    image_url: {
+      url: `data:${img.mediaType};base64,${img.base64}`,
+    },
+  }));
+
+  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': window.location.href,
+      'X-Title': 'CV Builder AI',
+    },
+    body: JSON.stringify({
+      model: 'google/gemini-2.0-flash-001',
+      messages: [
+        {
+          role: 'user',
+          content: [
+            ...imageContent,
+            {
+              type: 'text',
+              text: `Estrai tutto il testo visibile da queste ${images.length} immagini di un'offerta di lavoro.
+Le immagini sono in ordine: unisci il testo in un unico documento coerente.
+Mantieni la struttura originale (titoli, elenchi puntati, paragrafi).
+Restituisci SOLO il testo estratto, senza commenti o spiegazioni aggiuntive.`,
+            },
+          ],
+        },
+      ],
+      max_tokens: 4096,
+      temperature: 0.3,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
+    throw new Error(err.error?.message || `Errore API: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data.choices?.[0]?.message) {
+    throw new Error('Risposta inattesa da OpenRouter API');
+  }
+  return data.choices[0].message.content;
+};
+
 export const evaluateMockAnswer = async (
   question: string,
   answer: string,

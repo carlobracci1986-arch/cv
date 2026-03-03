@@ -53,6 +53,12 @@ export const ANALYTICS_EVENTS = {
   VERSION_SAVED: 'version_saved',
   VERSION_LOADED: 'version_loaded',
 
+  // ESTRAZIONE TESTO DA SCREENSHOT
+  JOB_SCREENSHOT_UPLOADED: 'job_screenshot_uploaded',
+  JOB_TEXT_EXTRACTION_STARTED: 'job_text_extraction_started',
+  JOB_TEXT_EXTRACTION_COMPLETED: 'job_text_extraction_completed',
+  JOB_TEXT_EXTRACTION_ERROR: 'job_text_extraction_error',
+
   // ERRORI
   ERROR_VALIDATION: 'error_validation',
   ERROR_GENERIC: 'error_generic',

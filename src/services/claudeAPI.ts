@@ -320,6 +320,58 @@ REGOLE STRICT:
   return parseJSON<InterviewPrepResult>(text);
 };
 
+export const extractTextFromImages = async (
+  images: { base64: string; mediaType: string }[]
+): Promise<string> => {
+  const apiKey = getApiKey();
+
+  const imageBlocks = images.map((img) => ({
+    type: 'image' as const,
+    source: {
+      type: 'base64' as const,
+      media_type: img.mediaType,
+      data: img.base64,
+    },
+  }));
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 4096,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            ...imageBlocks,
+            {
+              type: 'text',
+              text: `Estrai tutto il testo visibile da queste ${images.length} immagini di un'offerta di lavoro.
+Le immagini sono in ordine: unisci il testo in un unico documento coerente.
+Mantieni la struttura originale (titoli, elenchi puntati, paragrafi).
+Restituisci SOLO il testo estratto, senza commenti o spiegazioni aggiuntive.`,
+            },
+          ],
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
+    throw new Error(err.error?.message || `Errore API: ${response.status}`);
+  }
+
+  const data = await response.json();
+  return data.content[0].text;
+};
+
 export const evaluateMockAnswer = async (
   question: string,
   answer: string,

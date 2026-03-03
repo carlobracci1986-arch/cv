@@ -220,6 +220,57 @@ difficulty e probability: "low", "medium", "high"`;
   return parseJSON<InterviewPrepResult>(text);
 };
 
+export const extractTextFromImages = async (
+  images: { base64: string; mediaType: string }[]
+): Promise<string> => {
+  const apiKey = getApiKey();
+
+  const imageParts = images.map((img) => ({
+    inlineData: {
+      mimeType: img.mediaType,
+      data: img.base64,
+    },
+  }));
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              ...imageParts,
+              {
+                text: `Estrai tutto il testo visibile da queste ${images.length} immagini di un'offerta di lavoro.
+Le immagini sono in ordine: unisci il testo in un unico documento coerente.
+Mantieni la struttura originale (titoli, elenchi puntati, paragrafi).
+Restituisci SOLO il testo estratto, senza commenti o spiegazioni aggiuntive.`,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          maxOutputTokens: 4096,
+          temperature: 0.3,
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({ error: { message: response.statusText } }));
+    throw new Error(err.error?.message || `Errore API: ${response.status}`);
+  }
+
+  const data = await response.json();
+  if (!data.candidates?.[0]?.content) {
+    throw new Error('Risposta inattesa da Gemini API');
+  }
+  return data.candidates[0].content.parts[0].text;
+};
+
 export const evaluateMockAnswer = async (
   question: string,
   answer: string,
