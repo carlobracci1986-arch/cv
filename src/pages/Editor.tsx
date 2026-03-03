@@ -36,6 +36,7 @@ import { AIBadge } from '../components/ai-ui/AIBadge';
 import { AIFloatingButton } from '../components/ai-ui/AIFloatingButton';
 import { AIPromptBanner } from '../components/ai-ui/AIPromptBanner';
 import { AIProcessingModal } from '../components/ai-ui/AIProcessingModal';
+import { ExportCelebrationModal } from '../components/export/ExportCelebrationModal';
 import { AdvancedSettings } from '../components/Settings/AdvancedSettings';
 
 import { JobDescriptionInput } from '../components/AIFeatures/CVOptimizer/JobDescriptionInput';
@@ -102,6 +103,8 @@ export const Editor: React.FC = () => {
   const [showMockInterview, setShowMockInterview] = useState(false);
 
   const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exportPhase, setExportPhase] = useState<'generating' | 'celebration'>('generating');
 
   // AI Consent
   const [pendingAIAction, setPendingAIAction] = useState<{ action: string; fn: () => Promise<void> } | null>(null);
@@ -209,6 +212,8 @@ export const Editor: React.FC = () => {
     const el = document.getElementById('cv-preview-export');
     if (!el) { toast.error('Anteprima non trovata'); return; }
     setIsPdfLoading(true);
+    setExportPhase('generating');
+    setShowExportModal(true);
     try {
       const filename = generateFilename(cvData.personalInfo.firstName, cvData.personalInfo.lastName);
       await generatePDFFromElement(el, {
@@ -218,8 +223,9 @@ export const Editor: React.FC = () => {
         title: 'Curriculum Vitae',
       });
       addActivity({ action: 'cv_exported', details: filename, requiresConsent: false });
-      toast.success('PDF scaricato!');
+      setExportPhase('celebration');
     } catch (err) {
+      setShowExportModal(false);
       toast.error('Errore generazione PDF');
     } finally {
       setIsPdfLoading(false);
@@ -897,6 +903,14 @@ export const Editor: React.FC = () => {
         action={pendingAIAction?.action || ''}
         onConfirm={handleAIConsentConfirm}
         onCancel={() => { setShowAIConsent(false); setPendingAIAction(null); }}
+      />
+
+      <ExportCelebrationModal
+        isOpen={showExportModal}
+        phase={exportPhase}
+        cvData={cvData}
+        onClose={() => setShowExportModal(false)}
+        onOptimizeWithAI={() => { setMainTab('ai'); setAITab('optimizer'); }}
       />
     </div>
   );
