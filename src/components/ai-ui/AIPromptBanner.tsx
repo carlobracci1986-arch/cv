@@ -34,12 +34,12 @@ export const AIPromptBanner: React.FC<Props> = ({ onOptimize, hasJobDescription,
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate">
                 {hasJobDescription
-                  ? 'Pronto per ottimizzare! L\'IA migliorerà il tuo CV.'
-                  : 'Incolla un\'offerta di lavoro e lascia che l\'IA ottimizzi il tuo CV!'
+                  ? 'Hai un\'offerta? Perfetto! Fai brillare il tuo CV per quella posizione.'
+                  : 'Hai trovato un\'offerta interessante? Incollala e l\'IA fa il resto!'
                 }
               </p>
               <p className="text-xs text-white/70 hidden sm:block">
-                L'85% dei CV viene scartato dai filtri automatici. L'IA ti aiuta a superarli.
+                L'85% dei CV viene scartato senza essere letto. Tu non sarai tra quelli.
               </p>
             </div>
           </div>
@@ -49,7 +49,7 @@ export const AIPromptBanner: React.FC<Props> = ({ onOptimize, hasJobDescription,
               onClick={onOptimize}
               className="flex items-center gap-1.5 px-4 py-2 bg-white text-purple-700 text-sm font-bold rounded-lg hover:bg-purple-50 transition-colors"
             >
-              <span className="hidden sm:inline">Ottimizza ora</span>
+              <span className="hidden sm:inline">Fai brillare il CV</span>
               <span className="sm:hidden">IA</span>
               <ArrowRight className="w-4 h-4" />
             </button>

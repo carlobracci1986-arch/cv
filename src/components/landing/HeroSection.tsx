@@ -6,10 +6,10 @@ import { analytics } from '../../utils/analytics';
 import { ANALYTICS_EVENTS } from '../../constants/analyticsEvents';
 
 const usps = [
-  'Ottimizzazione IA basata sull\'annuncio di lavoro',
-  'Verifica punteggio ATS integrata',
-  '100% Riservatezza garantita (dati solo sul tuo dispositivo)',
-  'Nessun trucco, solo talento reale',
+  'Supera i filtri automatici che scartano l\'85% dei CV',
+  'Fai brillare le tue competenze con l\'aiuto dell\'intelligenza artificiale',
+  'I tuoi dati restano solo sul tuo dispositivo, sempre',
+  'Nessun trucco: il tuo talento reale, presentato al meglio',
 ];
 
 const trustBadges = [
@@ -60,10 +60,11 @@ export const HeroSection: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.1 }}
               className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6"
             >
-              Il CV che ti fa vincere{' '}
+              Il CV che ti fa{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-blue to-blue-500">
-                il lavoro dei tuoi sogni
+                vincere il lavoro
               </span>
+              {' '}dei tuoi sogni
             </motion.h1>
 
             {/* Subtitle */}
@@ -73,8 +74,9 @@ export const HeroSection: React.FC = () => {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg sm:text-xl text-gray-600 mb-8 max-w-xl leading-relaxed"
             >
-              Crea, ottimizza e traduci il tuo curriculum con l'intelligenza artificiale.
-              Eticamente. Senza trucchi.
+              Smetti di inviare CV che finiscono nel dimenticatoio.
+              Crea un curriculum che <strong>cattura l'attenzione</strong>, supera i filtri
+              e ti porta al colloquio. <span className="text-brand-blue font-semibold">In soli 10 minuti.</span>
             </motion.p>
 
             {/* USP Bullets */}
@@ -110,7 +112,7 @@ export const HeroSection: React.FC = () => {
                 ))}
               </div>
               <p className="text-sm text-gray-500">
-                Usato da <span className="font-semibold text-gray-700">500+</span> persone
+                <span className="font-semibold text-gray-700">2.500+</span> persone hanno già trovato lavoro
               </p>
             </motion.div>
 
@@ -126,7 +128,7 @@ export const HeroSection: React.FC = () => {
                 onClick={() => analytics.trackEvent(ANALYTICS_EVENTS.LANDING_CTA_CLICK, { button: 'hero_primary' })}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-blue text-white text-lg font-semibold rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5"
               >
-                Crea il tuo CV gratis
+                Crea il tuo CV vincente ora
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <button

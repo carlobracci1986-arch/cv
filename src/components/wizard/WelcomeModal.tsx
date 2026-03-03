@@ -42,35 +42,35 @@ export const WelcomeModal: React.FC<Props> = ({ isOpen, onStart, onSkip }) => {
 
             {/* Titolo */}
             <h2 className="font-heading text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-              Benvenuto in CVVincente!
+              Il tuo prossimo lavoro inizia qui
             </h2>
 
             <p className="text-base sm:text-lg text-gray-600 mb-8 max-w-md mx-auto">
-              Ti guideremo passo-passo nella creazione del tuo CV perfetto.
-              Ci vorranno solo <strong>5-10 minuti</strong>.
+              Ti guidiamo passo-passo nella creazione di un CV che fa colpo.
+              Bastano <strong>5-10 minuti</strong> per fare la differenza.
             </p>
 
             {/* 3 passaggi */}
             <div className="grid sm:grid-cols-3 gap-4 sm:gap-6 mb-8 text-left">
               <div className="bg-blue-50 rounded-xl p-4">
                 <PenLine className="w-7 h-7 text-brand-blue mb-3" />
-                <h4 className="font-semibold text-gray-900 mb-1">1. Compila</h4>
+                <h4 className="font-semibold text-gray-900 mb-1">1. Racconta chi sei</h4>
                 <p className="text-sm text-gray-600">
-                  Inserisci i tuoi dati in 5 sezioni semplici
+                  5 sezioni semplici, noi ti guidiamo
                 </p>
               </div>
               <div className="bg-purple-50 rounded-xl p-4">
                 <Sparkles className="w-7 h-7 text-purple-600 mb-3" />
-                <h4 className="font-semibold text-gray-900 mb-1">2. Ottimizza</h4>
+                <h4 className="font-semibold text-gray-900 mb-1">2. Fallo brillare</h4>
                 <p className="text-sm text-gray-600">
-                  L'IA migliora il tuo CV per ogni offerta
+                  L'IA riscrive il CV per ogni offerta
                 </p>
               </div>
               <div className="bg-green-50 rounded-xl p-4">
                 <Download className="w-7 h-7 text-green-600 mb-3" />
-                <h4 className="font-semibold text-gray-900 mb-1">3. Scarica</h4>
+                <h4 className="font-semibold text-gray-900 mb-1">3. Conquista</h4>
                 <p className="text-sm text-gray-600">
-                  Esporta il PDF professionale e candidati
+                  Scarica il PDF e candidati con fiducia
                 </p>
               </div>
             </div>
@@ -81,18 +81,18 @@ export const WelcomeModal: React.FC<Props> = ({ isOpen, onStart, onSkip }) => {
                 onClick={onStart}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-blue text-white text-lg font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25"
               >
-                Iniziamo!
+                Costruiamo il tuo CV!
               </button>
               <button
                 onClick={onSkip}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-200 text-gray-600 text-lg font-semibold rounded-xl hover:border-gray-300 transition-all"
               >
-                Vai all'editor
+                Sono un esperto, vai all'editor
               </button>
             </div>
 
             <p className="text-xs text-gray-400 mt-5">
-              Puoi salvare e continuare in qualsiasi momento
+              Il tuo lavoro viene salvato automaticamente. Puoi tornare quando vuoi.
             </p>
           </div>
         </motion.div>

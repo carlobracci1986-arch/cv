@@ -18,11 +18,11 @@ import { ProfessionalSummary } from '../FormSections/ProfessionalSummary';
 
 // Suggerimenti contestuali per ogni passaggio
 const STEP_TIPS: Record<string, string> = {
-  personal: 'Inserisci almeno nome, cognome ed email. Il telefono e la foto sono facoltativi ma consigliati.',
-  experience: 'Descrivi le tue responsabilit\u00e0 usando verbi d\'azione: "Gestito", "Sviluppato", "Coordinato", "Ottimizzato".',
-  education: 'Inserisci il titolo di studio pi\u00f9 recente per primo. Puoi aggiungerne pi\u00f9 di uno.',
-  skills: 'Aggiungi sia competenze tecniche che trasversali. Le lingue sono molto apprezzate dai selezionatori.',
-  summary: 'Scrivi 2-3 frasi che descrivano chi sei professionalmente. L\'IA pu\u00f2 aiutarti a migliorarlo dopo.',
+  personal: 'Come ti chiami? Come possono contattarti? Queste informazioni permettono ai selezionatori di trovarti.',
+  experience: 'Trucco del mestiere: usa verbi d\'azione come "Gestito", "Sviluppato", "Aumentato del 30%". I numeri fanno colpo!',
+  education: 'Parti dal titolo pi\u00f9 recente. Anche corsi, certificazioni e progetti personali contano!',
+  skills: 'Quali sono i tuoi superpoteri? Aggiungi competenze tecniche E trasversali. Le lingue sono un asso nella manica!',
+  summary: 'Racconta chi sei in 2-3 frasi. Pensa: "Cosa mi rende speciale?". L\'IA potr\u00e0 perfezionarlo dopo.',
 };
 
 interface Props {

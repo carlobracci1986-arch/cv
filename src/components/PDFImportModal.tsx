@@ -19,7 +19,7 @@ export const PDFImportModal: React.FC<Props> = ({ isOpen, onClose, onImport }) =
     if (!file) return;
 
     if (!file.type.includes('pdf')) {
-      toast.error('Per favore seleziona un file PDF');
+      toast.error('Seleziona un file PDF per importare il tuo CV');
       return;
     }
 
@@ -30,7 +30,7 @@ export const PDFImportModal: React.FC<Props> = ({ isOpen, onClose, onImport }) =
       const text = await extractTextFromPDF(file);
 
       if (!text.trim()) {
-        toast.error('Impossibile estrarre testo dal PDF');
+        toast.error('Il PDF sembra vuoto o non leggibile. Prova con un altro file.');
         return;
       }
 
@@ -40,7 +40,7 @@ export const PDFImportModal: React.FC<Props> = ({ isOpen, onClose, onImport }) =
       // Import the data
       onImport(parsedData as CVData);
 
-      toast.success('CV importato da PDF! ✅ Verifica e completa i dettagli');
+      toast.success('CV importato! Dai un\'occhiata e perfeziona i dettagli');
 
       onClose();
     } catch (error) {

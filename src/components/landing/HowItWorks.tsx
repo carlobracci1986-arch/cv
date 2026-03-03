@@ -6,22 +6,22 @@ const steps = [
   {
     icon: PenLine,
     number: '01',
-    title: 'Compila il CV',
-    description: 'Inserisci i tuoi dati o importa da un PDF esistente. Semplice e guidato.',
+    title: 'Racconta chi sei',
+    description: 'Inserisci le tue esperienze o importa un CV esistente. Ti guidiamo passo-passo, senza stress.',
     color: 'from-brand-blue to-blue-400',
   },
   {
     icon: Sparkles,
     number: '02',
-    title: 'Ottimizza con IA',
-    description: "Incolla l'annuncio di lavoro e lascia che l'intelligenza artificiale ottimizzi il tuo CV per il ruolo.",
+    title: 'Lascia fare alla magia',
+    description: "Incolla l'offerta di lavoro e l'IA riscrive il tuo CV con le parole che i selezionatori vogliono leggere.",
     color: 'from-brand-green to-emerald-400',
   },
   {
     icon: Download,
     number: '03',
-    title: 'Scarica e Vinci',
-    description: 'Esporta il PDF professionale ottimizzato per i filtri automatici e candidati con fiducia.',
+    title: 'Candidati e conquista',
+    description: 'Scarica il PDF perfetto, supera i filtri automatici e arriva al colloquio con fiducia.',
     color: 'from-brand-orange to-amber-400',
   },
 ];
@@ -39,7 +39,7 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.5 }}
             className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
           >
-            Come funziona
+            3 passi verso il lavoro dei tuoi sogni
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -48,7 +48,7 @@ export const HowItWorks: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-lg text-gray-600"
           >
-            3 semplici passaggi per il CV perfetto
+            Da zero a CV vincente in meno di 10 minuti
           </motion.p>
         </div>
 

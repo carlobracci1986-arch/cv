@@ -65,11 +65,11 @@ type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview';
 type MobileView = 'form' | 'preview';
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string; aiOptimizable?: boolean }[] = [
-  { id: 'personal', label: 'Dati Personali' },
-  { id: 'summary', label: 'Profilo', aiOptimizable: true },
+  { id: 'personal', label: 'Chi sei' },
+  { id: 'summary', label: 'La tua storia', aiOptimizable: true },
   { id: 'experience', label: 'Esperienze', aiOptimizable: true },
   { id: 'education', label: 'Formazione' },
-  { id: 'skills', label: 'Competenze', aiOptimizable: true },
+  { id: 'skills', label: 'Superpoteri', aiOptimizable: true },
   { id: 'other', label: 'Altro' },
   { id: 'protected', label: 'Categorie Protette' },
 ];
@@ -145,7 +145,7 @@ export const Editor: React.FC = () => {
 
   const handleOptimize = () => {
     if (!jobDescription.trim()) {
-      toast.error('Inserisci una job description prima di ottimizzare');
+      toast.error('Incolla prima un\'offerta di lavoro, così l\'IA sa cosa cercare!');
       return;
     }
     requireAIConsent('Ottimizzazione CV', async () => {
@@ -167,7 +167,7 @@ export const Editor: React.FC = () => {
         });
         conversionFunnel.markStage(FUNNEL_STAGES.AI_USED);
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Errore ottimizzazione');
+        toast.error(err instanceof Error ? err.message : 'Ops, qualcosa è andato storto. Riproviamo!');
         analytics.trackEvent(ANALYTICS_EVENTS.AI_OPTIMIZE_ERROR, { duration_ms: Date.now() - t0 });
       } finally {
         setIsOptimizing(false);
@@ -186,7 +186,7 @@ export const Editor: React.FC = () => {
     // Use the full optimized CV but only apply accepted sections
     updateCVData(optimizationResult.optimizedCV);
     setShowOptimizationModal(false);
-    toast.success(`${accepted.length} modifiche applicate!`);
+    toast.success(`${accepted.length} miglioramenti applicati! Il tuo CV è più forte ora 💪`);
     analytics.trackEvent(ANALYTICS_EVENTS.AI_CHANGES_APPLIED, { accepted_count: accepted.length, total_count: changes.length });
   };
 
@@ -196,11 +196,11 @@ export const Editor: React.FC = () => {
     try {
       const result = await evaluateATSWithClaude(cvData, settings);
       setAtsResult(result);
-      toast.success('Valutazione ATS completata con Claude AI!');
+      toast.success('Analisi completata! Scopri come migliorare il tuo punteggio');
       analytics.trackEvent(ANALYTICS_EVENTS.ATS_CHECK_COMPLETED, { score: result.score });
     } catch (error) {
       console.error('ATS evaluation error:', error);
-      toast.error('Errore nella valutazione ATS. Verifica la configurazione di Claude API.');
+      toast.error('Non riesco ad analizzare il CV. Controlla la connessione e riprova.');
     } finally {
       setIsCheckingATS(false);
     }
@@ -215,7 +215,7 @@ export const Editor: React.FC = () => {
         addActivity({ action: 'ai_cover_letter', details: `Tono: ${options.tone}`, requiresConsent: true });
         analytics.trackEvent(ANALYTICS_EVENTS.COVER_LETTER_GENERATED, { tone: options.tone });
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Errore generazione lettera');
+        toast.error(err instanceof Error ? err.message : 'Impossibile generare la lettera. Riprova tra poco!');
       } finally {
         setIsGeneratingCoverLetter(false);
       }
@@ -231,7 +231,7 @@ export const Editor: React.FC = () => {
         addActivity({ action: 'ai_interview_prep', details: `${result.questions.length} domande generate`, requiresConsent: true });
         analytics.trackEvent(ANALYTICS_EVENTS.INTERVIEW_PREP_GENERATED, { questions_count: result.questions.length });
       } catch (err) {
-        toast.error(err instanceof Error ? err.message : 'Errore generazione domande');
+        toast.error(err instanceof Error ? err.message : 'Impossibile preparare le domande. Riprova!');
       } finally {
         setIsLoadingInterview(false);
       }
@@ -240,7 +240,7 @@ export const Editor: React.FC = () => {
 
   const handleDownloadPDF = async () => {
     const el = document.getElementById('cv-preview-export');
-    if (!el) { toast.error('Anteprima non trovata'); return; }
+    if (!el) { toast.error('Anteprima non disponibile. Ricarica la pagina.'); return; }
     setIsPdfLoading(true);
     setExportPhase('generating');
     setShowExportModal(true);
@@ -260,7 +260,7 @@ export const Editor: React.FC = () => {
       conversionFunnel.markStage(FUNNEL_STAGES.PDF_EXPORTED);
     } catch (err) {
       setShowExportModal(false);
-      toast.error('Errore generazione PDF');
+      toast.error('Ops, il PDF non è stato generato. Riprova!');
       analytics.trackEvent(ANALYTICS_EVENTS.PDF_EXPORT_ERROR);
     } finally {
       setIsPdfLoading(false);
@@ -329,7 +329,7 @@ export const Editor: React.FC = () => {
             onClick={() => {
               const mockData = generateMockCVData();
               updateCVData(mockData);
-              toast.success('Dati di test generati!');
+              toast.success('CV di esempio caricato! Perfetto per esplorare le funzionalità');
               addActivity({
                 action: 'cv_updated',
                 details: 'Mock data generated for testing',
@@ -628,10 +628,10 @@ export const Editor: React.FC = () => {
               {/* AI sub-tabs */}
               <div className="flex gap-1 p-2 bg-gray-50 border-b border-gray-200 overflow-x-auto">
                 {([
-                  { id: 'optimizer', label: '✨ Ottimizza' },
-                  { id: 'ats', label: '📊 ATS Score' },
-                  { id: 'cover-letter', label: '📝 Lettera di Presentazione' },
-                  { id: 'interview', label: '🎤 Colloquio' },
+                  { id: 'optimizer', label: '✨ Fai brillare' },
+                  { id: 'ats', label: '📊 Supera i filtri' },
+                  { id: 'cover-letter', label: '📝 Lettera vincente' },
+                  { id: 'interview', label: '🎤 Prepara colloquio' },
                 ] as { id: AITab; label: string }[]).map(tab => (
                   <button
                     key={tab.id}
@@ -651,8 +651,8 @@ export const Editor: React.FC = () => {
                 {aiTab === 'optimizer' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-800 mb-1">Ottimizza per Job Posting</h3>
-                      <p className="text-xs text-gray-500 mb-3">Incolla l'offerta di lavoro e lascia che l'AI ottimizzi il tuo CV</p>
+                      <h3 className="text-sm font-semibold text-gray-800 mb-1">Fai brillare il CV per quella posizione</h3>
+                      <p className="text-xs text-gray-500 mb-3">Incolla l'offerta di lavoro e l'IA riscrive il tuo CV per superare la selezione</p>
                     </div>
                     <JobDescriptionInput
                       jobDescription={jobDescription}
@@ -666,8 +666,8 @@ export const Editor: React.FC = () => {
                 {aiTab === 'ats' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-800 mb-1">ATS Compatibility Score</h3>
-                      <p className="text-xs text-gray-500 mb-3">Analizza la compatibilità del tuo CV con i sistemi ATS</p>
+                      <h3 className="text-sm font-semibold text-gray-800 mb-1">Il tuo CV supera i filtri automatici?</h3>
+                      <p className="text-xs text-gray-500 mb-3">Scopri se il tuo CV viene letto dai recruiter o scartato dai robot</p>
                     </div>
                     {!atsResult ? (
                       <button
@@ -678,7 +678,7 @@ export const Editor: React.FC = () => {
                         {isCheckingATS ? (
                           <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Analisi in corso...</>
                         ) : (
-                          '📊 Analizza Compatibilità ATS'
+                          '📊 Verifica il mio CV'
                         )}
                       </button>
                     ) : (
@@ -695,11 +695,11 @@ export const Editor: React.FC = () => {
                     {!coverLetter ? (
                       <>
                         <div>
-                          <h3 className="text-sm font-semibold text-gray-800 mb-1">Genera Lettera di Presentazione</h3>
-                          <p className="text-xs text-gray-500 mb-3">AI genera una lettera personalizzata basata sul tuo CV e l'offerta</p>
+                          <h3 className="text-sm font-semibold text-gray-800 mb-1">Una lettera che conquista</h3>
+                          <p className="text-xs text-gray-500 mb-3">L'IA scrive una lettera di presentazione su misura che ti fa notare</p>
                           {!jobDescription && (
                             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800 mb-3">
-                              💡 Aggiungi una job description nella tab "Ottimizza" per una lettera più mirata
+                              💡 Aggiungi un'offerta di lavoro nella tab "Fai brillare" per una lettera ancora più mirata
                             </div>
                           )}
                         </div>
@@ -721,7 +721,7 @@ export const Editor: React.FC = () => {
                           document.body.appendChild(el);
                           await generatePDFFromElement(el, { filename: 'lettera_presentazione.pdf' });
                           document.body.removeChild(el);
-                          toast.success('PDF lettera scaricato!');
+                          toast.success('Lettera di presentazione scaricata! In bocca al lupo 🍀');
                         }}
                         onRegenerate={() => setCoverLetter('')}
                       />
@@ -732,8 +732,8 @@ export const Editor: React.FC = () => {
                 {aiTab === 'interview' && (
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-gray-800 mb-1">Preparazione Colloquio</h3>
-                      <p className="text-xs text-gray-500 mb-3">AI genera domande probabili e risposte suggerite basate sul tuo CV</p>
+                      <h3 className="text-sm font-semibold text-gray-800 mb-1">Arriva preparato, conquista il colloquio</h3>
+                      <p className="text-xs text-gray-500 mb-3">Scopri le domande che ti faranno e prepara risposte che colpiscono</p>
                     </div>
                     {interviewQuestions.length === 0 ? (
                       <button
@@ -744,7 +744,7 @@ export const Editor: React.FC = () => {
                         {isLoadingInterview ? (
                           <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generazione domande...</>
                         ) : (
-                          '🎤 Genera Domande Colloquio'
+                          '🎤 Prepara le mie domande'
                         )}
                       </button>
                     ) : (
@@ -780,7 +780,7 @@ export const Editor: React.FC = () => {
                 onLoad={loadVersion}
                 onDelete={deleteVersion}
                 onDuplicate={duplicateVersion}
-                onSaveNew={name => { saveVersion(name); toast.success(`Versione "${name}" salvata!`); analytics.trackEvent(ANALYTICS_EVENTS.VERSION_SAVED); }}
+                onSaveNew={name => { saveVersion(name); toast.success(`Versione "${name}" salvata! Così non perdi nulla`); analytics.trackEvent(ANALYTICS_EVENTS.VERSION_SAVED); }}
               />
             </div>
           )}
@@ -856,7 +856,7 @@ export const Editor: React.FC = () => {
               <button
                 onClick={() => {
                   saveVersion('Bozza');
-                  toast.success('Bozza salvata!');
+                  toast.success('Bozza salvata! Il tuo lavoro è al sicuro');
                 }}
                 className="flex-1 h-12 flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl text-sm transition-colors active:bg-gray-50"
               >

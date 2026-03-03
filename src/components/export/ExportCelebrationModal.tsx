@@ -299,7 +299,7 @@ export const ExportCelebrationModal: React.FC<Props> = ({
                       onClick={() => {
                         const text = `Ho appena creato il mio CV con CVVincente! 🏆`;
                         navigator.clipboard.writeText(text).then(() => {
-                          toast.success('Testo copiato negli appunti!');
+                          toast.success('Copiato! Ora condividilo con il mondo');
                         }).catch(() => {
                           toast.error('Impossibile copiare');
                         });

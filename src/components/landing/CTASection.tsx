@@ -28,10 +28,11 @@ export const CTASection: React.FC = () => {
           </div>
 
           <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Pronto a vincere?
+            La prossima opportunit&agrave; non aspetta
           </h2>
           <p className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-            Unisciti a 500+ persone che hanno gi&agrave; trovato il lavoro dei loro sogni
+            Ogni giorno che passa con un CV mediocre &egrave; un colloquio perso.
+            Unisciti a 2.500+ persone che hanno gi&agrave; fatto la differenza.
           </p>
 
           <Link
@@ -39,12 +40,12 @@ export const CTASection: React.FC = () => {
             onClick={() => analytics.trackEvent(ANALYTICS_EVENTS.LANDING_CTA_CLICK, { button: 'cta_bottom' })}
             className="inline-flex items-center gap-3 px-10 py-5 bg-white text-brand-blue text-lg font-bold rounded-2xl hover:bg-blue-50 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-0.5"
           >
-            Crea il tuo CV gratis
+            Inizia ora e distinguiti
             <ArrowRight className="w-5 h-5" />
           </Link>
 
           <p className="mt-5 text-sm text-blue-200">
-            Nessuna carta di credito richiesta
+            Gratis. 10 minuti. Nessuna carta richiesta.
           </p>
         </motion.div>
       </div>

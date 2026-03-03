@@ -5,48 +5,48 @@ import { Sparkles, ShieldCheck, FileText, Globe, MessageSquare, Lock } from 'luc
 const features = [
   {
     icon: Sparkles,
-    title: 'Ottimizzazione IA',
-    description: "L'intelligenza artificiale analizza l'annuncio e ottimizza il CV per massimizzare la compatibilit\u00e0 con la posizione.",
-    stat: '85% compatibilit\u00e0 media',
+    title: 'Fai brillare il tuo CV',
+    description: "Incolla l'offerta di lavoro e l'IA riformula le tue esperienze usando le parole chiave che i selezionatori cercano. Risultato? Più colloqui.",
+    stat: '85% compatibilità media',
     color: 'text-brand-blue',
     bg: 'bg-blue-50',
   },
   {
     icon: ShieldCheck,
-    title: 'Verifica Punteggio ATS',
-    description: 'Controlla se supererai i filtri automatici con suggerimenti specifici per migliorare.',
+    title: 'Supera i filtri automatici',
+    description: 'L\'85% dei CV viene scartato senza essere letto. Scopri il tuo punteggio e correggi i problemi prima di candidarti.',
     stat: '92% punteggio medio',
     color: 'text-brand-green',
     bg: 'bg-emerald-50',
   },
   {
     icon: FileText,
-    title: 'Lettera Motivazionale IA',
-    description: 'Genera lettere motivazionali personalizzate in 3 toni diversi.',
+    title: 'Lettera che conquista',
+    description: 'Genera una lettera di presentazione su misura per ogni candidatura. Professionale, personale, convincente.',
     stat: '3 stili disponibili',
     color: 'text-purple-600',
     bg: 'bg-purple-50',
   },
   {
     icon: Globe,
-    title: 'Traduzione Multilingua',
-    description: 'Traduci il CV in 5 lingue mantenendo il significato professionale.',
+    title: 'Candidati all\'estero',
+    description: 'Traduci il tuo CV in 5 lingue mantenendo il tono professionale. Apri le porte a opportunità internazionali.',
     stat: 'IT, EN, ES, DE, FR',
     color: 'text-brand-orange',
     bg: 'bg-amber-50',
   },
   {
     icon: MessageSquare,
-    title: 'Preparazione Colloquio',
-    description: 'Domande probabili, risposte suggerite e simulatore di colloquio.',
-    stat: '20+ domande',
+    title: 'Arriva preparato al colloquio',
+    description: 'Scopri le domande che ti faranno e allenati con il simulatore. Niente più ansia da colloquio.',
+    stat: '20+ domande generate',
     color: 'text-pink-600',
     bg: 'bg-pink-50',
   },
   {
     icon: Lock,
-    title: 'Riservatezza Garantita',
-    description: 'Tutti i dati salvati solo sul tuo navigatore. Zero server, zero tracciamento.',
+    title: 'I tuoi dati, solo tuoi',
+    description: 'Tutto resta sul tuo dispositivo. Nessun server, nessun tracciamento. La tua privacy viene prima di tutto.',
     stat: '100% conforme al GDPR',
     color: 'text-gray-600',
     bg: 'bg-gray-50',
@@ -76,7 +76,7 @@ export const FeaturesSection: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
           >
-            Tutto quello che ti serve per vincere
+            Tutto quello che ti serve per conquistare il lavoro
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -85,7 +85,7 @@ export const FeaturesSection: React.FC = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="text-lg text-gray-600 max-w-2xl mx-auto"
           >
-            6 strumenti potenti in un'unica applicazione gratuita
+            6 strumenti potenti che lavorano insieme per darti un vantaggio reale
           </motion.p>
         </div>
 

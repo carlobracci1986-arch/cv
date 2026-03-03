@@ -6,8 +6,8 @@ const steps = [
   {
     icon: FileSearch,
     number: '1',
-    title: 'Analizza',
-    description: "L'IA legge la descrizione dell'offerta di lavoro ed estrae le competenze chiave richieste dall'azienda.",
+    title: 'Capisce cosa cercano',
+    description: "L'IA legge l'offerta di lavoro e capisce esattamente quali competenze e parole chiave l'azienda vuole vedere nel tuo CV.",
     color: 'text-brand-blue',
     bg: 'bg-blue-100',
     gradient: 'from-brand-blue to-blue-400',
@@ -15,8 +15,8 @@ const steps = [
   {
     icon: Settings2,
     number: '2',
-    title: 'Ottimizza',
-    description: 'Riformula le tue esperienze enfatizzando le competenze pi\u00f9 rilevanti con linguaggio professionale.',
+    title: 'Riscrive per te',
+    description: 'Riformula le tue esperienze mettendo in risalto i tuoi punti di forza con un linguaggio che colpisce i selezionatori.',
     color: 'text-purple-600',
     bg: 'bg-purple-100',
     gradient: 'from-purple-600 to-purple-400',
@@ -24,8 +24,8 @@ const steps = [
   {
     icon: Rocket,
     number: '3',
-    title: 'Migliora',
-    description: 'Aumenta il punteggio di compatibilit\u00e0 e le possibilit\u00e0 di essere selezionato per il colloquio.',
+    title: 'Ti porta al colloquio',
+    description: 'Il tuo punteggio di compatibilità sale e con esso le tue possibilità di ricevere quella chiamata che aspetti.',
     color: 'text-brand-green',
     bg: 'bg-green-100',
     gradient: 'from-brand-green to-emerald-400',
@@ -33,10 +33,10 @@ const steps = [
 ];
 
 const stats = [
-  { value: '85%', label: 'Punteggio medio dopo ottimizzazione', color: 'text-purple-600' },
-  { value: '30s', label: 'Tempo medio di elaborazione', color: 'text-brand-blue' },
-  { value: '+40%', label: 'Pi\u00f9 chiamate per colloqui', color: 'text-brand-green' },
-  { value: '100%', label: 'Onesto e trasparente', color: 'text-brand-orange' },
+  { value: '85%', label: 'Compatibilità media raggiunta', color: 'text-purple-600' },
+  { value: '30s', label: 'Per trasformare il tuo CV', color: 'text-brand-blue' },
+  { value: '+40%', label: 'Più possibilità di colloquio', color: 'text-brand-green' },
+  { value: '100%', label: 'Il tuo talento, mai inventato', color: 'text-brand-orange' },
 ];
 
 export const AIExplainerSection: React.FC = () => {
@@ -65,7 +65,7 @@ export const AIExplainerSection: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="font-heading text-3xl sm:text-4xl font-bold text-gray-900 mb-4"
           >
-            Intelligenza Artificiale al Tuo Servizio
+            La tua arma segreta per ogni candidatura
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
@@ -74,7 +74,7 @@ export const AIExplainerSection: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-lg text-gray-600 max-w-2xl mx-auto"
           >
-            L'IA analizza l'offerta di lavoro e ottimizza il tuo CV per massimizzare le possibilit&agrave; di successo
+            L'IA capisce cosa cerca l'azienda e presenta il tuo talento nel modo pi&ugrave; efficace possibile
           </motion.p>
         </div>
 
