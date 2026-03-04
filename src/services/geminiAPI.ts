@@ -120,10 +120,14 @@ export const generateCoverLetter = async (
     technical: 'tecnico e preciso, focalizzato su competenze',
   };
 
+  const languageInstruction = options.language && options.language !== 'it'
+    ? `\nLINGUA: Scrivi INTERAMENTE in ${({ en: 'English', fr: 'Français', de: 'Deutsch' } as Record<string, string>)[options.language]}. Adatta formule di apertura/chiusura alle convenzioni del paese.`
+    : '';
+
   const prompt = `Sei un esperto career coach italiano. Scrivi una lettera di presentazione personalizzata.
 
 TONO: ${toneDescriptions[options.tone]}
-LUNGHEZZA TARGET: 250-400 parole
+LUNGHEZZA TARGET: 250-400 parole${languageInstruction}
 
 JOB DESCRIPTION:
 ${jobDescription}

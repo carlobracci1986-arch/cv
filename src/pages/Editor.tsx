@@ -48,6 +48,7 @@ import { CoverLetterForm } from '../components/AIFeatures/CoverLetterGenerator/C
 import { CoverLetterPreview } from '../components/AIFeatures/CoverLetterGenerator/CoverLetterPreview';
 import { QuestionsList } from '../components/AIFeatures/InterviewPrep/QuestionsList';
 import { MockInterviewSimulator } from '../components/AIFeatures/InterviewPrep/MockInterviewSimulator';
+import { TranslationPanel } from '../components/AIFeatures/TranslationPanel';
 
 import * as aiProvider from '../services/aiProvider';
 import { generatePDFFromElement, generateFilename } from '../utils/pdfGenerator';
@@ -58,10 +59,11 @@ import { ANALYTICS_EVENTS } from '../constants/analyticsEvents';
 import { conversionFunnel, FUNNEL_STAGES } from '../utils/conversionFunnel';
 import { useTrackTime } from '../hooks/useTrackEvent';
 import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuestion, CoverLetterOptions } from '../types/ai.types';
+import { CVData } from '../types/cv.types';
 
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
 type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'other' | 'protected';
-type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview';
+type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview' | 'translate';
 type MobileView = 'form' | 'preview';
 
 const EDITOR_SECTIONS: { id: EditorSection; label: string; aiOptimizable?: boolean }[] = [
@@ -106,6 +108,10 @@ export const Editor: React.FC = () => {
   const [interviewQuestions, setInterviewQuestions] = useState<InterviewQuestion[]>([]);
   const [isLoadingInterview, setIsLoadingInterview] = useState(false);
   const [showMockInterview, setShowMockInterview] = useState(false);
+
+  const [translatedCV, setTranslatedCV] = useState<CVData | null>(null);
+  const [translationLang, setTranslationLang] = useState<string | null>(null);
+  const [isTranslating, setIsTranslating] = useState(false);
 
   const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
@@ -632,10 +638,17 @@ export const Editor: React.FC = () => {
                   { id: 'ats', label: '📊 Supera i filtri' },
                   { id: 'cover-letter', label: '📝 Lettera vincente' },
                   { id: 'interview', label: '🎤 Prepara colloquio' },
+                  { id: 'translate', label: '🌍 Traduci CV' },
                 ] as { id: AITab; label: string }[]).map(tab => (
                   <button
                     key={tab.id}
-                    onClick={() => setAITab(tab.id)}
+                    onClick={() => {
+                      setAITab(tab.id);
+                      if (tab.id !== 'translate' && translatedCV) {
+                        setTranslatedCV(null);
+                        setTranslationLang(null);
+                      }
+                    }}
                     className={`flex-shrink-0 px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
                       aiTab === tab.id
                         ? 'bg-white text-primary-700 shadow-sm border border-gray-200'
@@ -768,6 +781,38 @@ export const Editor: React.FC = () => {
                     )}
                   </div>
                 )}
+
+                {aiTab === 'translate' && (
+                  <TranslationPanel
+                    cvData={cvData}
+                    onTranslated={(lang, translated) => {
+                      setTranslationLang(lang);
+                      setTranslatedCV(translated);
+                    }}
+                    onReset={() => {
+                      setTranslationLang(null);
+                      setTranslatedCV(null);
+                    }}
+                    onDownloadPDF={async () => {
+                      const el = document.getElementById('cv-preview-export');
+                      if (!el) { toast.error('Anteprima non disponibile'); return; }
+                      setIsPdfLoading(true);
+                      try {
+                        const langLabel = translationLang || 'it';
+                        const filename = generateFilename(cvData.personalInfo.firstName, cvData.personalInfo.lastName).replace('.pdf', `_${langLabel}.pdf`);
+                        await generatePDFFromElement(el, { filename, quality: 'high' });
+                        toast.success('PDF tradotto scaricato!');
+                      } catch {
+                        toast.error('Errore nella generazione del PDF');
+                      } finally {
+                        setIsPdfLoading(false);
+                      }
+                    }}
+                    activeLang={translationLang}
+                    isTranslating={isTranslating}
+                    setIsTranslating={setIsTranslating}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -838,7 +883,7 @@ export const Editor: React.FC = () => {
           <div className="flex-1 overflow-auto flex justify-center p-4 md:p-6">
             <div style={{ transformOrigin: 'top center' }}>
               <CVPreview
-                cvData={cvData}
+                cvData={translatedCV || cvData}
                 settings={settings}
                 scale={isMobile ? mobilePreviewScale : previewScale}
                 id="cv-preview-export"

@@ -196,10 +196,14 @@ export const generateCoverLetter = async (
 - Paragrafo 5: Chiusura propositiva e call to action (1-2 frasi)`,
   };
 
+  const languageInstruction = options.language && options.language !== 'it'
+    ? `\nLINGUA: Scrivi INTERAMENTE in ${({ en: 'English', fr: 'Français', de: 'Deutsch' } as Record<string, string>)[options.language]}. Adatta formule di apertura/chiusura alle convenzioni del paese.`
+    : '';
+
   const prompt = `Sei un esperto career coach italiano. Scrivi una lettera di presentazione personalizzata.
 
 TONO: ${toneDescriptions[options.tone]}
-LUNGHEZZA: ${lengthDescriptions[options.length || 'full']}
+LUNGHEZZA: ${lengthDescriptions[options.length || 'full']}${languageInstruction}
 
 JOB DESCRIPTION:
 ${jobDescription}

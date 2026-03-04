@@ -4,11 +4,10 @@ import {
   Type,
   Layout,
   Eye,
-  Globe,
   CheckCircle2,
   Camera,
 } from 'lucide-react';
-import { CVSettings, FontOption, LanguageCode, SpacingOption, TemplateType } from '../types/cv.types';
+import { CVSettings, FontOption, SpacingOption, TemplateType } from '../types/cv.types';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -89,20 +88,6 @@ const SECTIONS: SectionToggle[] = [
   { key: 'certifications', label: 'Certificazioni', mandatory: false },
   { key: 'drivingLicenses', label: 'Patenti', mandatory: false },
   { key: 'hobbies', label: 'Hobby & Interessi', mandatory: false },
-];
-
-interface LangOption {
-  code: LanguageCode;
-  flag: string;
-  label: string;
-}
-
-const LANGUAGES: LangOption[] = [
-  { code: 'it', flag: '🇮🇹', label: 'IT' },
-  { code: 'en', flag: '🇬🇧', label: 'EN' },
-  { code: 'es', flag: '🇪🇸', label: 'ES' },
-  { code: 'de', flag: '🇩🇪', label: 'DE' },
-  { code: 'fr', flag: '🇫🇷', label: 'FR' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -495,34 +480,6 @@ export const CVCustomizer: React.FC<Props> = ({ settings, onChange }) => {
           </div>
         </div>
 
-        {/* ---------------------------------------------------------------- */}
-        {/* 6. Language Selector                                              */}
-        {/* ---------------------------------------------------------------- */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-          <SectionHeader icon={<Globe className="w-4 h-4" />} title="Lingua CV" />
-          <div className="flex flex-wrap gap-2">
-            {LANGUAGES.map((lang) => {
-              const isSelected = settings.language === lang.code;
-              return (
-                <button
-                  key={lang.code}
-                  type="button"
-                  onClick={() => onChange({ language: lang.code as LanguageCode })}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                    isSelected
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-sm'
-                      : 'border-gray-200 text-gray-600 hover:border-blue-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <span role="img" aria-label={lang.label} className="text-base leading-none">
-                    {lang.flag}
-                  </span>
-                  <span>{lang.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
       </div>
     </div>

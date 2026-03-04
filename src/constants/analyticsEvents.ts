@@ -59,6 +59,12 @@ export const ANALYTICS_EVENTS = {
   JOB_TEXT_EXTRACTION_COMPLETED: 'job_text_extraction_completed',
   JOB_TEXT_EXTRACTION_ERROR: 'job_text_extraction_error',
 
+  // TRADUZIONE CV
+  CV_TRANSLATION_STARTED: 'cv_translation_started',
+  CV_TRANSLATION_COMPLETED: 'cv_translation_completed',
+  CV_TRANSLATION_ERROR: 'cv_translation_error',
+  COVER_LETTER_LANGUAGE_SELECTED: 'cover_letter_language_selected',
+
   // ERRORI
   ERROR_VALIDATION: 'error_validation',
   ERROR_GENERIC: 'error_generic',

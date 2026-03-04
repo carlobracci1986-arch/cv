@@ -22,6 +22,7 @@ export interface OptimizationResult {
 export interface CoverLetterOptions {
   tone: 'formal' | 'professional' | 'creative' | 'technical';
   length?: 'brief' | 'full';
+  language?: 'it' | 'en' | 'fr' | 'de';
   additionalInstructions?: string;
 }
 
