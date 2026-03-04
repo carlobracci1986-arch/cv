@@ -32,7 +32,7 @@ export const CTASection: React.FC = () => {
           </h2>
           <p className="text-lg sm:text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
             Ogni giorno che passa con un CV mediocre &egrave; un colloquio perso.
-            Unisciti a 2.500+ persone che hanno gi&agrave; fatto la differenza.
+            Unisciti a chi ha gi&agrave; fatto la differenza con un CV professionale.
           </p>
 
           <Link

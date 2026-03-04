@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { CVProvider } from './contexts/CVContext';
 import { PrivacyProvider } from './contexts/PrivacyContext';
@@ -14,6 +14,7 @@ import { Footer } from './components/Layout/Footer';
 
 const AppContent: React.FC = () => {
   const { consent, updateConsent } = usePrivacy();
+  const location = useLocation();
 
   const handleConsent = () => {
     updateConsent({
@@ -22,9 +23,20 @@ const AppContent: React.FC = () => {
     });
   };
 
+  const isEditor = location.pathname === '/editor';
+  const isLanding = location.pathname === '/';
+  const showConsent = !consent.hasConsented;
+
   return (
-    <BrowserRouter>
-      <ConsentModal isOpen={!consent.hasConsented} onConsent={handleConsent} />
+    <>
+      {/* Blocking modal only on editor, non-blocking banner on landing */}
+      {showConsent && isEditor && (
+        <ConsentModal isOpen blocking onConsent={handleConsent} />
+      )}
+      {showConsent && isLanding && (
+        <ConsentModal isOpen blocking={false} onConsent={handleConsent} />
+      )}
+
       <Routes>
         {/* Landing page - no editor layout */}
         <Route path="/" element={<Landing />} />
@@ -81,7 +93,7 @@ const AppContent: React.FC = () => {
           },
         }}
       />
-    </BrowserRouter>
+    </>
   );
 };
 
@@ -89,7 +101,9 @@ const App: React.FC = () => {
   return (
     <PrivacyProvider>
       <CVProvider>
-        <AppContent />
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
       </CVProvider>
     </PrivacyProvider>
   );

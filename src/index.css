@@ -95,6 +95,16 @@
   animation: shimmer 3s ease-in-out infinite;
 }
 
+/* Slide-up animation for consent banner */
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out;
+}
+
 /* CV Preview styles for print */
 @media print {
   body * {

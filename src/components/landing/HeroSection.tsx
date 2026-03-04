@@ -19,10 +19,10 @@ const trustBadges = [
   { icon: Heart, label: 'Fatto in Italia' },
 ];
 
-const floatingStats = [
-  { value: '92%', label: 'Punteggio ATS medio' },
+const highlights = [
+  { value: '3', label: 'Template professionali' },
   { value: '5', label: 'Lingue supportate' },
-  { value: '2 min', label: 'Per creare il CV' },
+  { value: '100%', label: 'Gratuito' },
 ];
 
 export const HeroSection: React.FC = () => {
@@ -76,7 +76,7 @@ export const HeroSection: React.FC = () => {
             >
               Smetti di inviare CV che finiscono nel dimenticatoio.
               Crea un curriculum che <strong>cattura l'attenzione</strong>, supera i filtri
-              e ti porta al colloquio. <span className="text-brand-blue font-semibold">In soli 10 minuti.</span>
+              e ti porta al colloquio.
             </motion.p>
 
             {/* USP Bullets */}
@@ -94,25 +94,18 @@ export const HeroSection: React.FC = () => {
               ))}
             </motion.ul>
 
-            {/* Social proof mini */}
+            {/* Social proof - honest version */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.35 }}
               className="flex items-center gap-3 mb-8"
             >
-              <div className="flex -space-x-2">
-                {[...Array(4)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full border-2 border-white bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold"
-                  >
-                    {['M', 'S', 'L', 'A'][i]}
-                  </div>
-                ))}
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-brand-green to-emerald-400">
+                <CheckCircle2 className="w-4 h-4 text-white" />
               </div>
-              <p className="text-sm text-gray-500">
-                <span className="font-semibold text-gray-700">2.500+</span> persone hanno già trovato lavoro
+              <p className="text-sm text-gray-600">
+                Gratuito, open source e senza registrazione
               </p>
             </motion.div>
 
@@ -203,14 +196,14 @@ export const HeroSection: React.FC = () => {
                 </div>
               </div>
 
-              {/* Floating Stats */}
-              {floatingStats.map((stat, i) => (
+              {/* Floating highlights - real data only */}
+              {highlights.map((stat, i) => (
                 <motion.div
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.6 + i * 0.15 }}
-                  className={`absolute bg-white rounded-xl shadow-lg border border-gray-100 px-4 py-3 ${
+                  className={`absolute bg-white rounded-xl shadow-lg border border-gray-100 px-4 py-3 hidden sm:block ${
                     i === 0
                       ? '-top-4 -left-4 sm:-left-8'
                       : i === 1

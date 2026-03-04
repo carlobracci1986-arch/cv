@@ -118,7 +118,7 @@ export const Testimonials: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="text-lg text-gray-600"
           >
-            Oltre 2.500 persone hanno già migliorato il loro CV con CVVincente
+            Scopri come CVVincente ha aiutato chi cerca lavoro
           </motion.p>
         </div>
 
@@ -237,25 +237,7 @@ export const Testimonials: React.FC = () => {
                   <Star key={i} className="w-5 h-5 fill-brand-orange text-brand-orange" />
                 ))}
               </div>
-              <p className="text-xs text-gray-500">su 450+ valutazioni</p>
-            </div>
-
-            <div className="hidden sm:block h-16 w-px bg-gray-200" />
-
-            <div className="space-y-1.5 flex-1 max-w-xs w-full">
-              {[
-                { stars: 5, pct: 92 },
-                { stars: 4, pct: 6 },
-                { stars: 3, pct: 2 },
-              ].map(row => (
-                <div key={row.stars} className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500 w-6">{row.stars}<Star className="w-2.5 h-2.5 inline ml-0.5 fill-gray-400 text-gray-400" /></span>
-                  <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-500 rounded-full" style={{ width: `${row.pct}%` }} />
-                  </div>
-                  <span className="text-xs font-medium text-gray-600 w-8 text-right">{row.pct}%</span>
-                </div>
-              ))}
+              <p className="text-xs text-gray-500">valutazione media</p>
             </div>
           </div>
         </motion.div>
