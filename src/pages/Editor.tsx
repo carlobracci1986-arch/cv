@@ -121,12 +121,23 @@ export const Editor: React.FC = () => {
   const [showAIConsent, setShowAIConsent] = useState(false);
 
   const previewRef = useRef<HTMLDivElement>(null);
+  const sectionTabsRef = useRef<HTMLDivElement>(null);
 
   // Analytics: traccia tempo nell'editor e apertura funnel
   useTrackTime('editor');
   React.useEffect(() => {
     conversionFunnel.markStage(FUNNEL_STAGES.EDITOR_OPENED, {
       device: isMobile ? 'mobile' : 'desktop',
+    });
+  }, []);
+
+  const scrollSectionTabIntoView = useCallback((sectionId: string) => {
+    requestAnimationFrame(() => {
+      const container = sectionTabsRef.current;
+      if (!container) return;
+      const idx = EDITOR_SECTIONS.findIndex(s => s.id === sectionId);
+      const btn = container.children[idx] as HTMLElement | undefined;
+      btn?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     });
   }, []);
 
@@ -532,7 +543,7 @@ export const Editor: React.FC = () => {
           {mainTab === 'editor' && (
             <>
               {/* Section tabs */}
-              <div className="flex gap-1 p-2 bg-gray-50 border-b border-gray-200 overflow-x-auto">
+              <div ref={sectionTabsRef} className="flex gap-1 p-2 bg-gray-50 border-b border-gray-200 overflow-x-auto">
                 {EDITOR_SECTIONS.map(sec => (
                   <button
                     key={sec.id}
@@ -619,23 +630,48 @@ export const Editor: React.FC = () => {
                   <button
                     onClick={() => {
                       const idx = EDITOR_SECTIONS.findIndex(s => s.id === editorSection);
-                      if (idx > 0) setEditorSection(EDITOR_SECTIONS[idx - 1].id);
+                      if (idx > 0) {
+                        const prevId = EDITOR_SECTIONS[idx - 1].id;
+                        setEditorSection(prevId);
+                        scrollSectionTabIntoView(prevId);
+                      }
                     }}
                     disabled={editorSection === EDITOR_SECTIONS[0].id}
                     className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="h-4 w-4" /> Precedente
                   </button>
-                  <button
-                    onClick={() => {
-                      const idx = EDITOR_SECTIONS.findIndex(s => s.id === editorSection);
-                      if (idx < EDITOR_SECTIONS.length - 1) setEditorSection(EDITOR_SECTIONS[idx + 1].id);
-                    }}
-                    disabled={editorSection === EDITOR_SECTIONS[EDITOR_SECTIONS.length - 1].id}
-                    className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700 disabled:opacity-30 disabled:cursor-not-allowed"
-                  >
-                    Successivo <ChevronRight className="h-4 w-4" />
-                  </button>
+
+                  {editorSection === EDITOR_SECTIONS[EDITOR_SECTIONS.length - 1].id ? (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => { setMobileView('preview'); setShowPreview(true); }}
+                        className="flex items-center gap-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 px-3 py-1.5 rounded-lg hover:bg-primary-50 transition-colors"
+                      >
+                        <Eye className="h-4 w-4" /> Anteprima CV
+                      </button>
+                      <button
+                        onClick={() => { setMainTab('ai'); setAITab('optimizer'); }}
+                        className="flex items-center gap-1.5 text-sm font-medium text-purple-600 hover:text-purple-700 px-3 py-1.5 rounded-lg hover:bg-purple-50 transition-colors"
+                      >
+                        <Brain className="h-4 w-4" /> Usa IA
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        const idx = EDITOR_SECTIONS.findIndex(s => s.id === editorSection);
+                        if (idx < EDITOR_SECTIONS.length - 1) {
+                          const nextId = EDITOR_SECTIONS[idx + 1].id;
+                          setEditorSection(nextId);
+                          scrollSectionTabIntoView(nextId);
+                        }
+                      }}
+                      className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
+                    >
+                      Successivo <ChevronRight className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </>
