@@ -16,7 +16,6 @@ interface Props {
 }
 
 const LANGUAGES = [
-  { code: 'it', flag: '🇮🇹', label: 'Italiano', description: 'Originale' },
   { code: 'en', flag: '🇬🇧', label: 'English', description: 'Inglese' },
   { code: 'fr', flag: '🇫🇷', label: 'Français', description: 'Francese' },
   { code: 'de', flag: '🇩🇪', label: 'Deutsch', description: 'Tedesco' },
@@ -31,45 +30,45 @@ export const TranslationPanel: React.FC<Props> = ({
   isTranslating,
   setIsTranslating,
 }) => {
+  const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const cacheRef = useRef<Map<string, CVData>>(new Map());
 
-  const handleTranslate = async (langCode: string) => {
-    if (langCode === 'it') {
-      onReset();
-      return;
-    }
+  const handleTranslate = async () => {
+    if (!selectedLang) return;
 
     // Check cache
-    const cached = cacheRef.current.get(langCode);
+    const cached = cacheRef.current.get(selectedLang);
     if (cached) {
-      onTranslated(langCode, cached);
+      onTranslated(selectedLang, cached);
       return;
     }
 
     setIsTranslating(true);
     setError(null);
-    analytics.trackEvent(ANALYTICS_EVENTS.CV_TRANSLATION_STARTED, { target_language: langCode });
+    analytics.trackEvent(ANALYTICS_EVENTS.CV_TRANSLATION_STARTED, { target_language: selectedLang });
 
     try {
-      const translated = await aiProvider.translateCV(cvData, langCode);
-      cacheRef.current.set(langCode, translated);
-      onTranslated(langCode, translated);
-      analytics.trackEvent(ANALYTICS_EVENTS.CV_TRANSLATION_COMPLETED, { target_language: langCode });
+      const translated = await aiProvider.translateCV(cvData, selectedLang);
+      cacheRef.current.set(selectedLang, translated);
+      onTranslated(selectedLang, translated);
+      analytics.trackEvent(ANALYTICS_EVENTS.CV_TRANSLATION_COMPLETED, { target_language: selectedLang });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Errore durante la traduzione');
-      analytics.trackEvent(ANALYTICS_EVENTS.CV_TRANSLATION_ERROR, { target_language: langCode });
+      analytics.trackEvent(ANALYTICS_EVENTS.CV_TRANSLATION_ERROR, { target_language: selectedLang });
     } finally {
       setIsTranslating(false);
     }
   };
+
+  const isShowingTranslation = activeLang && activeLang !== 'it';
 
   return (
     <div className="space-y-4">
       <div>
         <h3 className="text-sm font-semibold text-gray-800 mb-1">Traduci il tuo CV</h3>
         <p className="text-xs text-gray-500 mb-3">
-          L'IA traduce il tuo CV adattando terminologia professionale e convenzioni del paese
+          L'IA traduce il tuo CV adattando terminologia professionale, titoli delle sezioni e convenzioni del paese
         </p>
       </div>
 
@@ -79,62 +78,83 @@ export const TranslationPanel: React.FC<Props> = ({
             <Globe className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900">Seleziona lingua</h4>
+            <h4 className="text-sm font-semibold text-gray-900">Seleziona lingua di destinazione</h4>
             <p className="text-xs text-gray-500">
-              {activeLang && activeLang !== 'it'
+              {isShowingTranslation
                 ? `Stai visualizzando il CV in ${LANGUAGES.find(l => l.code === activeLang)?.label}`
                 : 'Il CV è in italiano (originale)'}
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 mb-4">
+        {/* Language selection */}
+        <div className="space-y-2 mb-4">
           {LANGUAGES.map((lang) => {
-            const isActive = lang.code === 'it' ? !activeLang || activeLang === 'it' : activeLang === lang.code;
-            const isCached = lang.code !== 'it' && cacheRef.current.has(lang.code);
+            const isSelected = selectedLang === lang.code;
+            const isCached = cacheRef.current.has(lang.code);
+            const isCurrentlyActive = activeLang === lang.code;
 
             return (
               <button
                 key={lang.code}
-                onClick={() => handleTranslate(lang.code)}
+                onClick={() => setSelectedLang(lang.code)}
                 disabled={isTranslating}
-                className={`flex items-center gap-2.5 px-3 py-3 rounded-xl border-2 text-left transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed ${
-                  isActive
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed ${
+                  isSelected
                     ? 'border-blue-500 bg-blue-50 shadow-sm'
                     : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
                 }`}
               >
-                <span className="text-xl leading-none">{lang.flag}</span>
+                <span className="text-2xl leading-none">{lang.flag}</span>
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm font-semibold ${isActive ? 'text-blue-700' : 'text-gray-700'}`}>
+                  <p className={`text-sm font-semibold ${isSelected ? 'text-blue-700' : 'text-gray-700'}`}>
                     {lang.label}
                   </p>
-                  <p className="text-[10px] text-gray-400">
-                    {lang.code === 'it' ? 'Originale' : isCached ? 'Tradotto (in cache)' : lang.description}
-                  </p>
+                  <p className="text-[11px] text-gray-400">{lang.description}</p>
                 </div>
+                {isCached && (
+                  <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    In cache
+                  </span>
+                )}
+                {isCurrentlyActive && (
+                  <span className="text-[10px] font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full border border-blue-200">
+                    Attivo
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
 
-        {isTranslating && (
-          <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-xl border border-blue-200">
-            <Loader2 className="w-5 h-5 text-blue-600 animate-spin flex-shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-blue-800">Traduzione in corso...</p>
-              <p className="text-xs text-blue-600">L'IA sta adattando il tuo CV alla lingua selezionata</p>
-            </div>
-          </div>
-        )}
+        {/* Translate button */}
+        <button
+          onClick={handleTranslate}
+          disabled={!selectedLang || isTranslating}
+          className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white rounded-xl text-sm font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+        >
+          {isTranslating ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Traduzione in corso...
+            </>
+          ) : (
+            <>
+              <Globe className="w-4 h-4" />
+              {selectedLang
+                ? `Traduci in ${LANGUAGES.find(l => l.code === selectedLang)?.label}`
+                : 'Seleziona una lingua'}
+            </>
+          )}
+        </button>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-xl">
             <p className="text-xs text-red-700">{error}</p>
           </div>
         )}
 
-        {activeLang && activeLang !== 'it' && !isTranslating && (
+        {isShowingTranslation && !isTranslating && (
           <div className="space-y-2 mt-4">
             <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
               <p className="text-xs text-emerald-700 font-medium">
@@ -154,7 +174,7 @@ export const TranslationPanel: React.FC<Props> = ({
                 className="flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
               >
                 <RotateCcw className="w-4 h-4" />
-                Italiano
+                Torna all'italiano
               </button>
             </div>
           </div>

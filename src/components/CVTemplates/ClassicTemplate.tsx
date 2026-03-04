@@ -27,7 +27,7 @@ const languageLevelLabel: Record<string, string> = {
 };
 
 export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
-  const { personalInfo, professionalSummary, experiences, education, skills, languages } = cvData;
+  const { personalInfo, professionalSummary, experiences, education, skills, languages, sectionLabels: labels } = cvData;
   const other = cvData.other || { certifications: [], drivingLicenses: [], hobbies: [] };
   const { accentColor, fontSize, spacing, showPhoto, showSections, sectionOrder } = settings;
 
@@ -64,7 +64,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     professionalSummary: showSections.professionalSummary && professionalSummary ? (
       <section key="professionalSummary">
         {divider}
-        {sectionTitle('Profilo Professionale')}
+        {sectionTitle(labels?.professionalSummary || 'Profilo Professionale')}
         <p style={{ fontSize: baseFontSize, color: '#374151', lineHeight: 1.65, margin: 0 }}>{professionalSummary}</p>
       </section>
     ) : null,
@@ -72,7 +72,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     experiences: showSections.experiences && experiences.length > 0 ? (
       <section key="experiences">
         {divider}
-        {sectionTitle('Esperienze Lavorative')}
+        {sectionTitle(labels?.experiences || 'Esperienze Lavorative')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {experiences.map((exp) => (
             <div key={exp.id}>
@@ -104,7 +104,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     education: showSections.education && education.length > 0 ? (
       <section key="education">
         {divider}
-        {sectionTitle('Formazione')}
+        {sectionTitle(labels?.education || 'Formazione')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {education.map((edu) => (
             <div key={edu.id}>
@@ -138,12 +138,12 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     skills: showSections.skills && skills.length > 0 ? (
       <section key="skills">
         {divider}
-        {sectionTitle('Competenze')}
+        {sectionTitle(labels?.skills || 'Competenze')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {technicalSkills.length > 0 && (
             <div>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Technical
+                {labels?.technicalSkills || 'Technical'}
               </span>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '5px' }}>
                 {technicalSkills.map(skill => (
@@ -168,7 +168,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
           {softSkills.length > 0 && (
             <div>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Competenze Trasversali
+                {labels?.softSkills || 'Competenze Trasversali'}
               </span>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '5px' }}>
                 {softSkills.map(skill => (
@@ -193,7 +193,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     languages: showSections.languages && languages.length > 0 ? (
       <section key="languages">
         {divider}
-        {sectionTitle('Lingue')}
+        {sectionTitle(labels?.languages || 'Lingue')}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
           {languages.map(lang => (
             <span key={lang.id} style={{
@@ -211,7 +211,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     certifications: showSections.certifications && other.certifications.length > 0 ? (
       <section key="certifications">
         {divider}
-        {sectionTitle('Certificazioni')}
+        {sectionTitle(labels?.certifications || 'Certificazioni')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {other.certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px' }}>
@@ -232,7 +232,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     drivingLicenses: showSections.drivingLicenses && other.drivingLicenses.length > 0 ? (
       <section key="drivingLicenses">
         {divider}
-        {sectionTitle('Patenti')}
+        {sectionTitle(labels?.drivingLicenses || 'Patenti')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {other.drivingLicenses.map(license => (
             <div key={license.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '4px' }}>
@@ -250,7 +250,7 @@ export const ClassicTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
     hobbies: showSections.hobbies && other.hobbies.length > 0 ? (
       <section key="hobbies">
         {divider}
-        {sectionTitle('Hobby e Interessi')}
+        {sectionTitle(labels?.hobbies || 'Hobby e Interessi')}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
           {other.hobbies.map((hobby, i) => (
             <span key={i} style={{

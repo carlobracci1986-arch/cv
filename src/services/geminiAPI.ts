@@ -171,6 +171,8 @@ RULES:
 - Keep the EXACT same JSON structure and keys
 - Translate ONLY string values, not keys
 - Do NOT add comments or explanations
+- IMPORTANT: Add a "sectionLabels" object with translated section titles:
+  {"professionalSummary":"...","experiences":"...","education":"...","skills":"...","languages":"...","certifications":"...","drivingLicenses":"...","hobbies":"...","contacts":"...","links":"...","technicalSkills":"...","softSkills":"..."}
 
 INPUT:
 ${JSON.stringify(cvForTranslation)}

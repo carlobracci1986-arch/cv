@@ -30,8 +30,8 @@ const features = [
   {
     icon: Globe,
     title: 'Candidati all\'estero',
-    description: 'Traduci il tuo CV in 5 lingue mantenendo il tono professionale. Apri le porte a opportunità internazionali.',
-    stat: 'IT, EN, ES, DE, FR',
+    description: 'Traduci CV e lettera di presentazione in inglese, francese o tedesco. L\'IA adatta terminologia, titoli delle sezioni e convenzioni professionali del paese.',
+    stat: 'EN, FR, DE + lettera',
     color: 'text-brand-orange',
     bg: 'bg-amber-50',
   },

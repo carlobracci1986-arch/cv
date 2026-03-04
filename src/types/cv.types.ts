@@ -85,6 +85,21 @@ export interface ProtectedCategory {
   details?: string;
 }
 
+export interface SectionLabels {
+  professionalSummary?: string;
+  experiences?: string;
+  education?: string;
+  skills?: string;
+  languages?: string;
+  certifications?: string;
+  drivingLicenses?: string;
+  hobbies?: string;
+  contacts?: string;
+  links?: string;
+  technicalSkills?: string;
+  softSkills?: string;
+}
+
 export interface CVData {
   personalInfo: PersonalInfo;
   professionalSummary: string;
@@ -94,6 +109,7 @@ export interface CVData {
   languages: Language[];
   other: OtherSection;
   protectedCategory?: ProtectedCategory;
+  sectionLabels?: SectionLabels;
 }
 
 export type TemplateType = 'classic' | 'modern' | 'minimalist' | 'creative' | 'technical';

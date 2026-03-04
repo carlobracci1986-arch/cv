@@ -41,7 +41,7 @@ function darkenColor(hex: string, amount: number): string {
 }
 
 export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
-  const { personalInfo, professionalSummary, experiences, education, skills, languages } = cvData;
+  const { personalInfo, professionalSummary, experiences, education, skills, languages, sectionLabels: labels } = cvData;
   const other = cvData.other || { certifications: [], drivingLicenses: [], hobbies: [] };
   const { accentColor, fontSize, spacing, showPhoto, showSections, sectionOrder } = settings;
 
@@ -164,7 +164,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
       <div style={{ padding: '20px 18px', display: 'flex', flexDirection: 'column', gap: sectionGap }}>
         {/* Contact */}
         <div>
-          {sidebarSectionTitle('Contatti')}
+          {sidebarSectionTitle(labels?.contacts || 'Contatti')}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
             {personalInfo.email && (
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
@@ -198,7 +198,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         {/* Links */}
         {(personalInfo.website || personalInfo.linkedin || personalInfo.github) && (
           <div>
-            {sidebarSectionTitle('Link')}
+            {sidebarSectionTitle(labels?.links || 'Link')}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
               {personalInfo.website && (
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
@@ -225,11 +225,11 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         {/* Skills */}
         {showSections.skills && skills.length > 0 && (
           <div>
-            {sidebarSectionTitle('Competenze')}
+            {sidebarSectionTitle(labels?.skills || 'Competenze')}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {technicalSkills.length > 0 && (
                 <div>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>Technical</span>
+                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>{labels?.technicalSkills || 'Technical'}</span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {technicalSkills.map(skill => (
                       <div key={skill.id}>
@@ -242,7 +242,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
               )}
               {softSkills.length > 0 && (
                 <div style={{ marginTop: softSkills.length > 0 && technicalSkills.length > 0 ? '4px' : '0' }}>
-                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>Competenze Trasversali</span>
+                  <span style={{ fontSize: '10px', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>{labels?.softSkills || 'Competenze Trasversali'}</span>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
                     {softSkills.map(skill => (
                       <span key={skill.id} style={{
@@ -265,7 +265,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         {/* Languages */}
         {showSections.languages && languages.length > 0 && (
           <div>
-            {sidebarSectionTitle('Lingue')}
+            {sidebarSectionTitle(labels?.languages || 'Lingue')}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {languages.map(lang => (
                 <div key={lang.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -289,7 +289,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
         {/* Hobbies */}
         {showSections.hobbies && other.hobbies.length > 0 && (
           <div>
-            {sidebarSectionTitle('Interessi')}
+            {sidebarSectionTitle(labels?.hobbies || 'Interessi')}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
               {other.hobbies.map((hobby, i) => (
                 <span key={i} style={{
@@ -313,14 +313,14 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
   const mainSectionComponents: Record<string, React.ReactNode> = {
     professionalSummary: showSections.professionalSummary && professionalSummary ? (
       <section key="professionalSummary" style={{ marginBottom: sectionGap }}>
-        {mainSectionTitle('Profilo Professionale')}
+        {mainSectionTitle(labels?.professionalSummary || 'Profilo Professionale')}
         <p style={{ fontSize: baseFontSize, color: '#374151', lineHeight: 1.7, margin: 0 }}>{professionalSummary}</p>
       </section>
     ) : null,
 
     experiences: showSections.experiences && experiences.length > 0 ? (
       <section key="experiences" style={{ marginBottom: sectionGap }}>
-        {mainSectionTitle('Esperienze Lavorative')}
+        {mainSectionTitle(labels?.experiences || 'Esperienze Lavorative')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {experiences.map((exp) => (
             <div key={exp.id} style={{ display: 'flex', gap: '12px' }}>
@@ -357,7 +357,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
 
     education: showSections.education && education.length > 0 ? (
       <section key="education" style={{ marginBottom: sectionGap }}>
-        {mainSectionTitle('Formazione')}
+        {mainSectionTitle(labels?.education || 'Formazione')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {education.map((edu) => (
             <div key={edu.id} style={{ display: 'flex', gap: '12px' }}>
@@ -396,7 +396,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
 
     certifications: showSections.certifications && other.certifications.length > 0 ? (
       <section key="certifications" style={{ marginBottom: sectionGap }}>
-        {mainSectionTitle('Certificazioni')}
+        {mainSectionTitle(labels?.certifications || 'Certificazioni')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {other.certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
@@ -421,7 +421,7 @@ export const ModernTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
 
     drivingLicenses: showSections.drivingLicenses && other.drivingLicenses.length > 0 ? (
       <section key="drivingLicenses" style={{ marginBottom: sectionGap }}>
-        {mainSectionTitle('Patenti')}
+        {mainSectionTitle(labels?.drivingLicenses || 'Patenti')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {other.drivingLicenses.map(license => (
             <div key={license.id} style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>

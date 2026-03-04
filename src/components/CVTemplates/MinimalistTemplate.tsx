@@ -25,7 +25,7 @@ const languageLevelFull: Record<string, string> = {
 };
 
 export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) => {
-  const { personalInfo, professionalSummary, experiences, education, skills, languages } = cvData;
+  const { personalInfo, professionalSummary, experiences, education, skills, languages, sectionLabels: labels } = cvData;
   const other = cvData.other || { certifications: [], drivingLicenses: [], hobbies: [] };
   const { accentColor, fontSize, spacing, showSections, sectionOrder } = settings;
 
@@ -67,7 +67,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     professionalSummary: showSections.professionalSummary && professionalSummary ? (
       <section key="professionalSummary">
         {thinRule}
-        {sectionTitle('Profilo Professionale')}
+        {sectionTitle(labels?.professionalSummary || 'Profilo Professionale')}
         <p style={{
           fontSize: baseFontSize,
           color: '#4b5563',
@@ -83,7 +83,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     experiences: showSections.experiences && experiences.length > 0 ? (
       <section key="experiences">
         {thinRule}
-        {sectionTitle('Esperienze Lavorative')}
+        {sectionTitle(labels?.experiences || 'Esperienze Lavorative')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {experiences.map((exp) => (
             <div key={exp.id}>
@@ -120,7 +120,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     education: showSections.education && education.length > 0 ? (
       <section key="education">
         {thinRule}
-        {sectionTitle('Formazione')}
+        {sectionTitle(labels?.education || 'Formazione')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: sectionGap }}>
           {education.map((edu) => (
             <div key={edu.id}>
@@ -152,7 +152,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     skills: showSections.skills && skills.length > 0 ? (
       <section key="skills">
         {thinRule}
-        {sectionTitle('Competenze')}
+        {sectionTitle(labels?.skills || 'Competenze')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {['technical', 'soft'].map(category => {
             const categorySkills = skills.filter(s => s.category === category);
@@ -168,7 +168,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
                   marginBottom: '6px',
                   fontWeight: 400,
                 }}>
-                  {category === 'technical' ? 'Technical' : 'Soft'}
+                  {category === 'technical' ? (labels?.technicalSkills || 'Technical') : (labels?.softSkills || 'Soft')}
                 </span>
                 <p style={{ margin: 0, fontSize: baseFontSize, color: '#4b5563', fontWeight: 300, lineHeight: 1.6 }}>
                   {categorySkills.map(s => s.name).join(' · ')}
@@ -183,7 +183,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     languages: showSections.languages && languages.length > 0 ? (
       <section key="languages">
         {thinRule}
-        {sectionTitle('Lingue')}
+        {sectionTitle(labels?.languages || 'Lingue')}
         <div style={{ display: 'flex', flexWrap: 'wrap', columnGap: '32px', rowGap: '6px' }}>
           {languages.map(lang => (
             <div key={lang.id} style={{ fontSize: baseFontSize }}>
@@ -198,7 +198,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     certifications: showSections.certifications && other.certifications.length > 0 ? (
       <section key="certifications">
         {thinRule}
-        {sectionTitle('Certificazioni')}
+        {sectionTitle(labels?.certifications || 'Certificazioni')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {other.certifications.map(cert => (
             <div key={cert.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
@@ -219,7 +219,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     drivingLicenses: showSections.drivingLicenses && other.drivingLicenses.length > 0 ? (
       <section key="drivingLicenses">
         {thinRule}
-        {sectionTitle('Patenti')}
+        {sectionTitle(labels?.drivingLicenses || 'Patenti')}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {other.drivingLicenses.map(license => (
             <div key={license.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px' }}>
@@ -237,7 +237,7 @@ export const MinimalistTemplate: React.FC<Props> = ({ cvData, settings, id }) =>
     hobbies: showSections.hobbies && other.hobbies.length > 0 ? (
       <section key="hobbies">
         {thinRule}
-        {sectionTitle('Interessi')}
+        {sectionTitle(labels?.hobbies || 'Interessi')}
         <p style={{ fontSize: baseFontSize, color: '#4b5563', fontWeight: 300, margin: 0, lineHeight: 1.6 }}>
           {other.hobbies.join(' · ')}
         </p>
