@@ -236,23 +236,30 @@ export const translateCV = async (cvData: CVData, targetLanguage: string): Promi
     it: 'Italian',
   };
 
-  const prompt = `You are a professional translator and career expert. Translate this Italian CV to ${languageNames[targetLanguage] || targetLanguage}.
+  // Strip non-translatable fields to reduce token usage
+  const { personalInfo, ...rest } = cvData;
+  const { profilePhoto, ...personalInfoClean } = personalInfo;
+  const cvForTranslation = { personalInfo: personalInfoClean, ...rest };
 
-TRANSLATION RULES:
-1. Maintain professional terminology appropriate for the target country's job market
-2. Adapt idiomatic expressions, not just translate literally
-3. Keep proper names (person name, company names) unchanged
-4. Technical terms: keep English technical terms if standard in the field
-5. Dates: adapt to target country format
-6. Keep the exact same JSON structure
+  const prompt = `You are a professional translator. Translate this Italian CV JSON to ${languageNames[targetLanguage] || targetLanguage}.
 
-ORIGINAL CV (JSON):
-${JSON.stringify(cvData, null, 2)}
+RULES:
+- Keep proper names (person, companies) unchanged
+- Keep technical terms in English if standard
+- Keep the EXACT same JSON structure and keys
+- Translate ONLY string values, not keys
+- Do NOT add comments or explanations
 
-OUTPUT: Respond ONLY with valid JSON with the same structure as the input, but with all text fields translated.`;
+INPUT:
+${JSON.stringify(cvForTranslation)}
 
-  const text = await callClaude(prompt, 5000);
-  return parseJSON<CVData>(text);
+OUTPUT: Respond with ONLY the translated JSON, no markdown, no code blocks.`;
+
+  const text = await callClaude(prompt, 8000);
+  const translated = parseJSON<CVData>(text);
+  // Restore non-translatable fields
+  translated.personalInfo.profilePhoto = profilePhoto;
+  return translated;
 };
 
 export const generateInterviewPrep = async (cvData: CVData, jobDescription: string): Promise<InterviewPrepResult> => {
