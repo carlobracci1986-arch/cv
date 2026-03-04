@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import {
   Download, Sparkles, ChevronLeft, ChevronRight,
   Palette, FolderOpen, Settings, Brain, Wand2, Menu, X,
-  PenLine, Eye, ZoomIn, ZoomOut, Trophy, ArrowLeft
+  PenLine, Eye, ZoomIn, ZoomOut, Trophy, ArrowLeft, Trash2
 } from 'lucide-react';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useWizard } from '../hooks/useWizard';
@@ -77,7 +77,7 @@ const EDITOR_SECTIONS: { id: EditorSection; label: string; aiOptimizable?: boole
 ];
 
 export const Editor: React.FC = () => {
-  const { cvData, settings, versions, lastSaved, isDirty, updateCVData, updateSettings, saveVersion, loadVersion, deleteVersion, duplicateVersion } = useCV();
+  const { cvData, settings, versions, lastSaved, isDirty, updateCVData, updateSettings, saveVersion, loadVersion, deleteVersion, duplicateVersion, resetToDefaults } = useCV();
   const { addActivity } = usePrivacy();
   const { hasAIConsent, saveAIConsent, grantAIConsent } = useConsent();
 
@@ -116,6 +116,7 @@ export const Editor: React.FC = () => {
   const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [exportPhase, setExportPhase] = useState<'generating' | 'celebration'>('generating');
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   // AI Consent
   const [pendingAIAction, setPendingAIAction] = useState<{ action: string; fn: () => Promise<void> } | null>(null);
@@ -349,6 +350,16 @@ export const Editor: React.FC = () => {
             <span className="hidden sm:inline whitespace-nowrap">Dati Test</span>
           </button>
 
+          {/* Clear All - Desktop */}
+          <button
+            onClick={() => setShowClearConfirm(true)}
+            title="Svuota tutti i campi"
+            className="hidden sm:flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-2 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-colors flex-shrink-0"
+          >
+            <Trash2 className="h-4 w-4 flex-shrink-0" />
+            <span className="hidden md:inline whitespace-nowrap">Svuota</span>
+          </button>
+
           {/* Download PDF - Desktop */}
           <button
             onClick={handleDownloadPDF}
@@ -416,6 +427,13 @@ export const Editor: React.FC = () => {
                     setShowMobileMenu(false);
                   }}
                 />
+                <button
+                  onClick={() => { setShowClearConfirm(true); setShowMobileMenu(false); }}
+                  className="w-full flex items-center gap-3 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Svuota tutti i campi
+                </button>
               </div>
             </nav>
           </motion.div>
@@ -996,6 +1014,73 @@ export const Editor: React.FC = () => {
         onClose={() => setShowExportModal(false)}
         onOptimizeWithAI={() => { setMainTab('ai'); setAITab('optimizer'); }}
       />
+
+      {/* Clear All Confirmation Modal */}
+      <AnimatePresence>
+        {showClearConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            onClick={() => setShowClearConfirm(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">Svuota tutti i campi</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Stai per cancellare tutti i dati del CV. Vuoi salvare una versione prima di procedere?
+              </p>
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    const versionName = `Backup ${new Date().toLocaleDateString('it-IT')} ${new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`;
+                    saveVersion(versionName);
+                    resetToDefaults();
+                    setTranslatedCV(null);
+                    setTranslationLang(null);
+                    setShowClearConfirm(false);
+                    toast.success('Versione salvata e campi svuotati');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <FolderOpen className="w-4 h-4" />
+                  Salva versione e cancella
+                </button>
+                <button
+                  onClick={() => {
+                    resetToDefaults();
+                    setTranslatedCV(null);
+                    setTranslationLang(null);
+                    setShowClearConfirm(false);
+                    toast.success('Tutti i campi sono stati svuotati');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white py-2.5 px-4 rounded-lg text-sm font-medium transition-colors"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Cancella tutto
+                </button>
+                <button
+                  onClick={() => setShowClearConfirm(false)}
+                  className="w-full py-2.5 px-4 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+                >
+                  Annulla
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
