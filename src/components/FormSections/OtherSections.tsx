@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Award, ChevronDown, ChevronUp, GripVertical, X, Heart, Car } from 'lucide-react';
-import { Certification, DrivingLicense, OtherSection } from '../../types/cv.types';
+import { Certification, DrivingLicense, OtherSection, ProtectedCategory } from '../../types/cv.types';
+import { ProtectedCategoryForm } from './ProtectedCategory';
 import { nanoid } from '../../utils/nanoid';
 
 interface Props {
   data: OtherSection;
   onChange: (data: OtherSection) => void;
+  protectedCategory?: ProtectedCategory;
+  onProtectedCategoryChange?: (category: ProtectedCategory) => void;
 }
 
-export const OtherSectionsForm: React.FC<Props> = ({ data, onChange }) => {
+export const OtherSectionsForm: React.FC<Props> = ({ data, onChange, protectedCategory, onProtectedCategoryChange }) => {
   const [expandedId, setExpandedId] = useState<string | null>(
     data.certifications.length > 0 ? data.certifications[0].id : null
   );
@@ -342,6 +345,14 @@ export const OtherSectionsForm: React.FC<Props> = ({ data, onChange }) => {
           </div>
         )}
       </div>
+
+      {/* Categorie Protette */}
+      {onProtectedCategoryChange && (
+        <ProtectedCategoryForm
+          protectedCategory={protectedCategory}
+          onProtectedCategoryChange={onProtectedCategoryChange}
+        />
+      )}
     </div>
   );
 };

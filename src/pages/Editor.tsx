@@ -19,7 +19,6 @@ import { ExperienceForm } from '../components/FormSections/Experience';
 import { EducationForm } from '../components/FormSections/Education';
 import { SkillsForm } from '../components/FormSections/Skills';
 import { OtherSectionsForm } from '../components/FormSections/OtherSections';
-import { ProtectedCategoryForm } from '../components/FormSections/ProtectedCategory';
 import { PhotoUpload } from '../components/FormSections/PhotoUpload';
 import { ProfessionalSummary } from '../components/FormSections/ProfessionalSummary';
 
@@ -62,7 +61,7 @@ import { OptimizationChange, OptimizationResult, ATSScoreResult, InterviewQuesti
 import { CVData } from '../types/cv.types';
 
 type MainTab = 'editor' | 'ai' | 'versions' | 'settings';
-type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'other' | 'protected';
+type EditorSection = 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'other';
 type AITab = 'optimizer' | 'ats' | 'cover-letter' | 'interview' | 'translate';
 type MobileView = 'form' | 'preview';
 
@@ -73,7 +72,6 @@ const EDITOR_SECTIONS: { id: EditorSection; label: string; aiOptimizable?: boole
   { id: 'education', label: 'Formazione' },
   { id: 'skills', label: 'Superpoteri', aiOptimizable: true },
   { id: 'other', label: 'Altro' },
-  { id: 'protected', label: 'Categorie Protette' },
 ];
 
 export const Editor: React.FC = () => {
@@ -609,10 +607,6 @@ export const Editor: React.FC = () => {
                       <OtherSectionsForm
                         data={cvData.other}
                         onChange={other => updateCVData({ other })}
-                      />
-                    )}
-                    {editorSection === 'protected' && (
-                      <ProtectedCategoryForm
                         protectedCategory={cvData.protectedCategory}
                         onProtectedCategoryChange={protectedCategory => updateCVData({ protectedCategory })}
                       />
