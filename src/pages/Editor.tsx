@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import {
   Download, Sparkles, ChevronLeft, ChevronRight,
   Palette, FolderOpen, Settings, Brain, Wand2, Menu, X,
-  PenLine, Eye, ZoomIn, ZoomOut, Trophy, ArrowLeft, Trash2
+  PenLine, Eye, ZoomIn, ZoomOut, Trophy, ArrowLeft, Trash2, FileText
 } from 'lucide-react';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useWizard } from '../hooks/useWizard';
@@ -88,6 +88,7 @@ export const Editor: React.FC = () => {
   const [showPreview, setShowPreview] = useState(true);
   const [previewScale, setPreviewScale] = useState(0.45);
   const [mobilePreviewScale, setMobilePreviewScale] = useState(0.5);
+  const [pageCount, setPageCount] = useState(1);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [mobileView, setMobileView] = useState<MobileView>('form');
 
@@ -920,6 +921,15 @@ export const Editor: React.FC = () => {
                 <span className="hidden md:inline">&minus;</span>
               </button>
               <span className="text-xs text-gray-500 w-12 text-center">{Math.round((isMobile ? mobilePreviewScale : previewScale) * 100)}%</span>
+              {/* Page count badge */}
+              <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
+                pageCount === 1 ? 'bg-green-100 text-green-700' :
+                pageCount === 2 ? 'bg-yellow-100 text-yellow-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                <FileText className="w-3 h-3" />
+                {pageCount} pag.
+              </span>
               <button
                 onClick={() => isMobile ? setMobilePreviewScale(s => Math.min(1, s + 0.1)) : setPreviewScale(s => Math.min(1, s + 0.05))}
                 className="w-9 h-9 md:w-auto md:h-auto md:px-2 md:py-1 flex items-center justify-center text-xs border border-gray-200 rounded-lg md:rounded hover:bg-gray-50"
@@ -938,6 +948,7 @@ export const Editor: React.FC = () => {
                 settings={settings}
                 scale={isMobile ? mobilePreviewScale : previewScale}
                 id="cv-preview-export"
+                onPageCountChange={setPageCount}
               />
             </div>
           </div>
