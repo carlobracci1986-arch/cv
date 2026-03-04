@@ -787,7 +787,10 @@ export const Editor: React.FC = () => {
                     cvData={cvData}
                     onTranslated={(lang, translated) => {
                       setTranslationLang(lang);
-                      setTranslatedCV(translated);
+                      setTranslatedCV({
+                        ...translated,
+                        sectionLabels: { ...translated.sectionLabels, _lang: lang },
+                      });
                     }}
                     onReset={() => {
                       setTranslationLang(null);

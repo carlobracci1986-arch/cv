@@ -1,37 +1,39 @@
 import { GDPRConsentType } from '../types/cv.types';
 import { PersonalInfo } from '../types/cv.types';
-import { GDPR_CONSENT_TEXTS } from '../constants/gdprConsent';
+import { GDPR_CONSENT_TEXTS, GDPR_BY_LANGUAGE } from '../constants/gdprConsent';
 
 export function getGDPRConsentText(
   type: GDPRConsentType,
   customText: string | undefined,
   personalInfo: PersonalInfo,
-  includeDate: boolean = false
+  includeDate: boolean = false,
+  language: string = 'it'
 ): string {
+  const texts = GDPR_BY_LANGUAGE[language] || GDPR_CONSENT_TEXTS;
   let text = '';
 
   switch (type) {
     case 'minimal':
-      text = GDPR_CONSENT_TEXTS.minimal;
+      text = texts.minimal;
       break;
     case 'standard':
-      text = GDPR_CONSENT_TEXTS.standard;
+      text = texts.standard;
       break;
     case 'extended':
-      text = GDPR_CONSENT_TEXTS.extended;
+      text = texts.extended;
       break;
     case 'complete':
-      text = GDPR_CONSENT_TEXTS.complete
+      text = texts.complete
         .replace('[NOME COGNOME]', `${personalInfo.firstName} ${personalInfo.lastName}`.trim() || '___________________')
         .replace('[LUOGO]', personalInfo.city || '___________________')
         .replace('[DATA]', personalInfo.dateOfBirth || '___________________')
         .replace('[INDIRIZZO]', personalInfo.address || '___________________');
       break;
     case 'custom':
-      text = customText || GDPR_CONSENT_TEXTS.standard;
+      text = customText || texts.standard;
       break;
     default:
-      text = GDPR_CONSENT_TEXTS.standard;
+      text = texts.standard;
   }
 
   return text;

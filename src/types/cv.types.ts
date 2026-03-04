@@ -86,6 +86,7 @@ export interface ProtectedCategory {
 }
 
 export interface SectionLabels {
+  _lang?: string;
   professionalSummary?: string;
   experiences?: string;
   education?: string;

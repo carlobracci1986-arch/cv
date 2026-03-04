@@ -62,6 +62,7 @@ export const CVPreview = forwardRef<HTMLDivElement, Props>(({ cvData, settings, 
           customGdprText={settings.customGdprText}
           includeConsentDate={settings.includeConsentDate}
           includeSignature={settings.includeSignature}
+          language={cvData.sectionLabels?._lang || 'it'}
         />
       </div>
     </div>

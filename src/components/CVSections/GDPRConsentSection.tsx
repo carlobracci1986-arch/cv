@@ -8,6 +8,7 @@ interface Props {
   customGdprText?: string;
   includeConsentDate: boolean;
   includeSignature: boolean;
+  language?: string;
 }
 
 export const GDPRConsentSection: React.FC<Props> = ({
@@ -16,12 +17,14 @@ export const GDPRConsentSection: React.FC<Props> = ({
   customGdprText,
   includeConsentDate,
   includeSignature,
+  language = 'it',
 }) => {
   const gdprText = getGDPRConsentText(
     gdprConsentType,
     customGdprText,
     personalInfo,
-    includeConsentDate
+    includeConsentDate,
+    language
   );
 
   return (
